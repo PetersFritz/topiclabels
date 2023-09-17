@@ -1,0 +1,39 @@
+Package: PACKAGENAME
+Type: Package
+Title: PACKAGE TITLE
+Version: 0.0.1
+Date: 2023-09-17
+Authors@R: c(person(given = "VORNAME",
+           family = "NACHNAME",
+           role = c("aut", "cre"),
+           email = "mail",
+	   comment = c(ORCID = "orcid")),
+    person(given = "VORNAME",
+           family = "NACHNAME",
+           role = "aut",
+           email = "mail",
+	   comment = c(ORCID = "orcid")),
+    person(given = "Jonas",
+           family = "Rieger",
+           role = "aut",
+           email = "rieger@statistik.tu-dortmund.de",
+           comment = c(ORCID = "0000-0002-0007-4478")))
+Maintainer: VORNAME NAME <MAIL>
+Description: SOME TEXT
+License: GPL (>= 3)
+Encoding: UTF-8
+Depends:
+	R (>= 3.6.0)
+Imports:
+	checkmate (>= 1.8.5),
+	progress,
+	stats
+LazyData: true
+RoxygenNote: 7.2.3
+URL: GITHUB URL
+BugReports: GITHUB ISSE URL
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
