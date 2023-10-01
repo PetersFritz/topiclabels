@@ -1,4 +1,4 @@
-#' @title TITLE OF PACKAGE
+#' @title topiclabels
 #'
 #' @description DESCRIPTION
 #'
@@ -12,4 +12,5 @@
 #' @import stats
 #' @import checkmate
 #' @import progress
+#' @import httr
 "_PACKAGE"
