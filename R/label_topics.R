@@ -60,6 +60,12 @@ label_topics = function(
   # checkmate terms, params, token, ...
 
   model_output = character(k)
+  prompts = sapply(terms, function(x)
+    generate_standard_prompt(
+      terms = x,
+      context = context,
+      sep_terms = sep_terms,
+      max_length_label = max_length_label))
   message(paste0(
     sprintf("Labeling %s topic(s) using the language model %s", k, model),
     ifelse(with_token, " and a Huggingface API token.", ".")))
@@ -72,13 +78,9 @@ label_topics = function(
   if(with_token){
     for(i in seq_len(k)){
       # gibt's hier auch ratelimits? Wie hoch?
-      prompt = generate_standard_prompt(terms = terms[[i]],
-                                        context = context,
-                                        sep_terms = sep_terms,
-                                        max_length_label = max_length_label)
       model_output[i] = interact_with_token(model = model,
                                             params = params,
-                                            prompt = prompt,
+                                            prompt = prompts[i],
                                             token = token)[[1]][[1]]
       pb$tick()
     }
@@ -88,13 +90,9 @@ label_topics = function(
     # der Modelle abspeichern (kann man das ggf. auch per GET abfragen?)
     # ratelimit für falcon relativ niedrig: in etwa 15-20
     for(i in seq_len(k)){
-      prompt = generate_standard_prompt(terms = terms[[i]],
-                                        context = context,
-                                        sep_terms = sep_terms,
-                                        max_length_label = max_length_label)
       model_output[i] = interact(model = model,
                                  params = params,
-                                 prompt = prompt)[[1]][[1]]
+                                 prompt = prompts[i])[[1]][[1]]
       pb$tick()
     }
   }
@@ -102,6 +100,7 @@ label_topics = function(
     strsplit(model_output, "\""), function(x)
       ifelse(length(x) == 3, x[2], NA_character_))
   list(
+    prompts = prompts,
     model_output = model_output,
     labels = model_output_processed)
 }
