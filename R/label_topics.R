@@ -74,6 +74,7 @@ label_topics = function(
     callback = function(x) message("Labeling process finished"),
     total = k,
     format = "Label topic :current/:total  [:bar] :percent elapsed: :elapsed eta: :eta")
+  time_start = Sys.time()
 
   if(with_token){
     for(i in seq_len(k)){
@@ -96,11 +97,30 @@ label_topics = function(
       pb$tick()
     }
   }
+  time_end = Sys.time()
+
   model_output_processed = sapply(
     strsplit(model_output, "\""), function(x)
       ifelse(length(x) == 3, x[2], NA_character_))
-  list(
+  res = list(
     prompts = prompts,
+    model = model,
+    params = params,
+    with_token = with_token,
+    time = as.numeric(difftime(time_end, time_start, units = "secs")),
     model_output = model_output,
-    labels = model_output_processed)
+    labels = model_output_processed
+  )
+  class(res) = "lm_topic_labels"
+  res
+}
+
+#' @export
+print.lm_topic_labels = function(x, ...){
+  # insert alignment for topic ids
+  cat(
+    "lm_topic_labels Object generated using ", x$model, "\n ",
+    paste0(seq_along(x$labels), ": ", x$labels, collapse = "\n "),
+    sep = ""
+  )
 }
