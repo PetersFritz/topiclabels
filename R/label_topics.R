@@ -28,6 +28,7 @@
 #' @param sep_terms description
 #' @param max_length_label description
 #' @param prompt_type description
+#' @param progress description
 #'
 #' @return [\code{character(k)}] Labels for all \code{k} topics.
 #'
@@ -44,7 +45,8 @@ label_topics = function(
     context = "",
     sep_terms = "; ",
     max_length_label = 5L,
-    prompt_type = 1L){
+    prompt_type = 1L,
+    progress = TRUE){
 
   params = c(params, .default_model_params(model))
   params = params[!duplicated(names(params))]
@@ -62,36 +64,48 @@ label_topics = function(
   k = length(terms)
   # checkmate terms, params, token, ...
 
+  model_output = character(k)
+  message(paste0(
+    sprintf("Labeling %s topic(s) using the language model %s", k, model),
+    ifelse(with_token, " and a Huggingface API token.", ".")))
+  pb = .make_progress_bar(
+    progress = progress,
+    callback = function(x) message("Labeling process finished"),
+    total = k,
+    format = "Label topic :current/:total  [:bar] :percent elapsed: :elapsed eta: :eta")
+
   if(with_token){
-    # message! mit token; model; k topics
-    # progress bar.
     for(i in seq_len(k)){
       prompt = generate_standard_prompt(terms = terms[[i]],
                                         context = context,
                                         sep_terms = sep_terms,
                                         max_length_label = max_length_label)
-      res = interact_with_token(model = model,
-                                params = params,
-                                prompt = prompt,
-                                token = token)
-      # res bearbeiten und zusammenfassen!
+      model_output[i] = interact_with_token(model = model,
+                                            params = params,
+                                            prompt = prompt,
+                                            token = token)[[1]][[1]]
+      pb$tick()
     }
   }else{
-    # message! mit token; model; k topics
     # falls zu viele Topics zu labeln -> könnte etwas Zeit kosten (ja/nein)
-    # progress bar.
-    message(sprintf("Labeling %s topic(s) using the language model %s.",
-                    k, model))
+    # hängt vllt auch vom Model ab, ratelimits und sleeping times in Abhängigkeit
+    # der Modelle abspeichern (kann man das ggf. auch per GET abfragen?)
+    # ratelimit für falcon relativ niedrig: in etwa 15-20
     for(i in seq_len(k)){
       prompt = generate_standard_prompt(terms = terms[[i]],
                                         context = context,
                                         sep_terms = sep_terms,
                                         max_length_label = max_length_label)
-      res = interact(model = model,
-                     params = params,
-                     prompt = prompt)
-      # res bearbeiten und zusammenfassen!
+      model_output[i] = interact(model = model,
+                                 params = params,
+                                 prompt = prompt)[[1]][[1]]
+      pb$tick()
     }
   }
-  res
+  model_output_processed = sapply(
+    strsplit(model_output, "\""), function(x)
+      ifelse(length(x) == 3, x[2], NA_character_))
+  list(
+    model_output = model_output,
+    labels = model_output_processed)
 }
