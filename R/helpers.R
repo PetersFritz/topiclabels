@@ -4,7 +4,7 @@
   return(list())
 }
 
-.make_progress_bar = function(progress, ...) {
+.make_progress_bar = function(progress, ...){
   if (progress && getOption("width") >= 20L){
     progress_bar$new(...)
   }else{

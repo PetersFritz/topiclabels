@@ -51,15 +51,10 @@ label_topics = function(
   params = c(params, .default_model_params(model))
   params = params[!duplicated(names(params))]
   with_token = FALSE
-  if(!missing(token)){
-    with_token = TRUE
-  }
+  if(!missing(token)) with_token = TRUE
   if(!is.list(terms)){
-    if(is.matrix(terms)){
-      terms = as.list(as.data.frame(terms))
-    }else{
-      terms = list(terms)
-    }
+    if(is.matrix(terms)) terms = as.list(as.data.frame(terms))
+    else terms = list(terms)
   }
   k = length(terms)
   # checkmate terms, params, token, ...
@@ -76,6 +71,7 @@ label_topics = function(
 
   if(with_token){
     for(i in seq_len(k)){
+      # gibt's hier auch ratelimits? Wie hoch?
       prompt = generate_standard_prompt(terms = terms[[i]],
                                         context = context,
                                         sep_terms = sep_terms,
