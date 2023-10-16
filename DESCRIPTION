@@ -26,6 +26,7 @@ Depends:
 	R (>= 3.6.0)
 Imports:
 	checkmate (>= 1.8.5),
+	httr,
 	progress,
 	stats
 LazyData: true
