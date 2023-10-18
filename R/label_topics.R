@@ -99,9 +99,6 @@ label_topics = function(
   }
   time_end = Sys.time()
 
-  model_output_processed = sapply(
-    strsplit(model_output, "\""), function(x)
-      ifelse(length(x) == 3, x[2], NA_character_))
   res = list(
     prompts = prompts,
     model = model,
@@ -109,7 +106,7 @@ label_topics = function(
     with_token = with_token,
     time = as.numeric(difftime(time_end, time_start, units = "secs")),
     model_output = model_output,
-    labels = model_output_processed
+    labels = .extract_labels(model_output)
   )
   class(res) = "lm_topic_labels"
   res

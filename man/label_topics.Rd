@@ -12,13 +12,17 @@ label_topics(
   context = "",
   sep_terms = "; ",
   max_length_label = 5L,
-  prompt_type = 1L
+  prompt_type = 1L,
+  progress = TRUE
 )
 }
 \arguments{
 \item{terms}{[\code{list (k) of character}]\cr
-List (each list entry represents one topic) of character vectors
-containing the top terms representing the topics that are to be labeled.}
+List (each list entry represents one topic) of \code{character} vectors
+containing the top terms representing the topics that are to be labeled.
+If a single \code{character} vector is passed, this is interpreted as
+the top terms of a single topic. If a \code{character} matrix is passed,
+each column is interpreted as the top terms of a topic.}
 
 \item{model}{[\code{character(1)}]\cr
 Optional. Default is \code{tiiuae/falcon-7b-instruct}.\cr
@@ -41,6 +45,8 @@ TBA}
 \item{max_length_label}{description}
 
 \item{prompt_type}{description}
+
+\item{progress}{description}
 }
 \value{
 [\code{character(k)}] Labels for all \code{k} topics.
