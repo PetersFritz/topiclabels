@@ -9,8 +9,11 @@ generate_standard_prompt = function(terms,
   introduce_terms = "The top terms of the topic are listed below:\n\n"
   note = paste0("Your answer should only consist of the best label ",
                 "for the topic and should not be longer than ",
-                max_length_label, " words. ",
-                "Only label topics if you can generate a meaningful label.")
+                max_length_label, " words.")# ",
+                #"Only label topics if you can generate a meaningful label.")
+  # Letzter Satz hat bei mir zu Verschlechterung geführt - daher auskommentiert.
+  # Das Modell hat dann zwei Label als Optionen gegeben, die aber beide sehr an den
+  # Label orientiert waren statt an der übergeordneten Bedeutung.
   paste0(context, ifelse(context == "", "", "\n\n"),
          intro,
          task, " ", introduce_terms,
