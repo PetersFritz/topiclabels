@@ -48,3 +48,6 @@ unnamed-chunk-*.pdf
 *fdb_latexmk
 
 .DS_Store
+
+# local files of abi
+local_abi/
