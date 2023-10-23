@@ -12,6 +12,7 @@
   if(!any(ind))
     return(model_output_processed)
   # hier steht aktuell nochmal der gleiche Code. Einfach entsprechend anpassen
+  # z.B. "topic is (related to)" als identifier (regex formulieren)
   model_output_processed[ind] = sapply(
     strsplit(model_output[ind], "\""), function(x)
       ifelse(length(x) == 3, x[2], NA_character_))
