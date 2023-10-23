@@ -38,7 +38,7 @@ given in the details section.}
 Optional.\cr
 TBA}
 
-\item{context}{description}
+\item{context}{description example}
 
 \item{sep_terms}{description}
 

@@ -24,7 +24,7 @@
 #' @param token [\code{character(1)}]\cr
 #' Optional.\cr
 #' TBA
-#' @param context description
+#' @param context description example
 #' @param sep_terms description
 #' @param max_length_label description
 #' @param prompt_type description

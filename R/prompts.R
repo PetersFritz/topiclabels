@@ -9,8 +9,9 @@ generate_standard_prompt = function(terms,
   introduce_terms = "The top terms of the topic are listed below:\n\n"
   note = paste0("Your answer should only consist of the best label ",
                 "for the topic and should not be longer than ",
-                max_length_label, " words.")
-  paste0(context,
+                max_length_label, " words. ",
+                "Only label topics if you can generate a meaningful label.")
+  paste0(context, ifelse(context == "", "", "\n\n"),
          intro,
          task, " ", introduce_terms,
          paste(terms, collapse = sep_terms), "\n\n",
