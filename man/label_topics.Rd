@@ -13,6 +13,7 @@ label_topics(
   sep_terms = "; ",
   max_length_label = 5L,
   prompt_type = 1L,
+  max_wait = 0L,
   progress = TRUE
 )
 }
@@ -45,6 +46,10 @@ TBA}
 \item{max_length_label}{description}
 
 \item{prompt_type}{description}
+
+\item{max_wait}{[\code{integer(1)}]\cr
+time in minutes after which the user is ask whether to proceed if rate limit
+is reached (default 0 -> user is askes every time the rate limit is reached)}
 
 \item{progress}{description}
 }

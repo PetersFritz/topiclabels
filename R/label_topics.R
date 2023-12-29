@@ -90,7 +90,7 @@ label_topics = function(
         if(max_wait == 0L){
           time_end = Sys.time()
           return(as.lm_topic_labels(
-            prompts = prompts, model = model, params = params,
+            terms = terms, prompts = prompts, model = model, params = params,
             with_token = !(token == ""),
             time = as.numeric(difftime(time_end, time_start, units = "mins")),
             model_output = model_output, labels = .extract_labels(model_output)))
@@ -115,32 +115,7 @@ label_topics = function(
   time_end = Sys.time()
 
   as.lm_topic_labels(
-    prompts = prompts, model = model, params = params, with_token = !(token == ""),
+    terms = terms, prompts = prompts, model = model, params = params, with_token = !(token == ""),
     time = as.numeric(difftime(time_end, time_start, units = "mins")),
     model_output = model_output, labels = .extract_labels(model_output))
-}
-
-as.lm_topic_labels = function(prompts, model, params, with_token, time,
-                              model_output, labels){
-  res = list(
-    prompts = prompts,
-    model = model,
-    params = params,
-    with_token = with_token,
-    time = time,
-    model_output = model_output,
-    labels = labels
-  )
-  class(res) = "lm_topic_labels"
-  res
-}
-
-#' @export
-print.lm_topic_labels = function(x, ...){
-  # insert alignment for topic ids
-  cat(
-    "lm_topic_labels Object generated using ", x$model, "\n ",
-    paste0(seq_along(x$labels), ": ", x$labels, collapse = "\n "),
-    sep = ""
-  )
 }
