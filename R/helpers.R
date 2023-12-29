@@ -38,14 +38,16 @@
 
 .ask_user = function(){
   continue = menu(c("Yes", "No, quit and output already labeled topics"),
-                  title = paste0("Would you like to continue waiting ",
+                  title = paste0("\nThe predefined waiting time if the rate ",
+                                 "limit is reached has been exceeded. Would ",
+                                 "you like to continue waiting ",
                                  "for all topics to be labeled?"))
-  stopifnot(continue == 1L)
+  if(continue == 2) return(0L)
   repeat{
     max_wait = readline(
       prompt = paste0("After how many minutes would you like to be\n",
                       "asked the next time whether you would like to\n",
-                      "wait any longer when the rate limit is reached?\n",
+                      "wait any longer if the rate limit is reached?\n",
                       "(insert integer): "))
     max_wait = suppressWarnings(as.numeric(max_wait))
     if(!is.na(max_wait) && test_integerish(max_wait)) break

@@ -87,30 +87,49 @@ label_topics = function(
     while(grepl("rate limit reached", model_output[i], ignore.case = TRUE)){
       if(as.numeric(difftime(Sys.time(), waited, units = "mins")) > max_wait){
         max_wait = .ask_user()
+        if(max_wait == 0L){
+          time_end = Sys.time()
+          return(as.lm_topic_labels(
+            prompts = prompts, model = model, params = params,
+            with_token = !(token == ""),
+            time = as.numeric(difftime(time_end, time_start, units = "mins")),
+            model_output = model_output, labels = .extract_labels(model_output)))
+        }
         waited = Sys.time()
-        #Sys.sleep(4*60) #sleep 5 minutes if rate limit is reached
+        message("Wait for five minutes", appendLF = FALSE)
+        Sys.sleep(5*60) #sleep 5 minutes if rate limit is reached
+      }else{
+        message("\nRate limit reached - wait for one minute", appendLF = FALSE)
+        Sys.sleep(60) #sleep 1 minute after each unsuccessful query
       }
-      message("\nRate limit reached", appendLF = FALSE)
-      Sys.sleep(60) #sleep 1 minute after each unsuccessful query
-      message(" - try to continue ", appendLF = FALSE)
+      message(" - try to continue (total minutes elapsed: ",
+              round(as.numeric(difftime(Sys.time(), time_start, units = "mins")), 2),
+              ")", appendLF = FALSE)
       model_output[i] = interact(model = model,
                                  params = params,
                                  prompt = prompts[i],
                                  token = token)[[1]][[1]]
     }
-    message(" - Success")
     pb$tick()
   }
   time_end = Sys.time()
 
+  as.lm_topic_labels(
+    prompts = prompts, model = model, params = params, with_token = !(token == ""),
+    time = as.numeric(difftime(time_end, time_start, units = "mins")),
+    model_output = model_output, labels = .extract_labels(model_output))
+}
+
+as.lm_topic_labels = function(prompts, model, params, with_token, time,
+                              model_output, labels){
   res = list(
     prompts = prompts,
     model = model,
     params = params,
-    with_token = !(token == ""),
-    time = as.numeric(difftime(time_end, time_start, units = "secs")),
+    with_token = with_token,
+    time = time,
     model_output = model_output,
-    labels = .extract_labels(model_output)
+    labels = labels
   )
   class(res) = "lm_topic_labels"
   res
