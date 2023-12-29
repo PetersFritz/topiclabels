@@ -28,6 +28,9 @@
 #' @param sep_terms description
 #' @param max_length_label description
 #' @param prompt_type description
+#' @param max_wait [\code{integer(1)}]\cr
+#' time in minutes after which the user is ask whether to proceed if rate limit
+#' is reached (default 0 -> user is askes every time the rate limit is reached)
 #' @param progress description
 #'
 #' @return [\code{character(k)}] Labels for all \code{k} topics.
@@ -46,12 +49,12 @@ label_topics = function(
     sep_terms = "; ",
     max_length_label = 5L,
     prompt_type = 1L,
+    max_wait = 0L,
     progress = TRUE){
 
   params = c(params, .default_model_params(model))
   params = params[!duplicated(names(params))]
-  with_token = FALSE
-  if(!missing(token)) with_token = TRUE
+  if(missing(token)) token = ""
   if(!is.list(terms)){
     if(is.matrix(terms)) terms = as.list(as.data.frame(terms))
     else terms = list(terms)
@@ -68,34 +71,35 @@ label_topics = function(
       max_length_label = max_length_label))
   message(paste0(
     sprintf("Labeling %s topic(s) using the language model %s", k, model),
-    ifelse(with_token, " and a Huggingface API token.", ".")))
+    ifelse(!(token == ""), " and a Huggingface API token.", ".")))
   pb = .make_progress_bar(
     progress = progress,
     callback = function(x) message("Labeling process finished"),
     total = k,
     format = "Label topic :current/:total  [:bar] :percent elapsed: :elapsed eta: :eta")
-  time_start = Sys.time()
+  time_start = waited = Sys.time()
 
-  if(with_token){
-    for(i in seq_len(k)){
-      # gibt's hier auch ratelimits? Wie hoch?
-      model_output[i] = interact_with_token(model = model,
-                                            params = params,
-                                            prompt = prompts[i],
-                                            token = token)[[1]][[1]]
-      pb$tick()
-    }
-  }else{
-    # falls zu viele Topics zu labeln -> könnte etwas Zeit kosten (ja/nein)
-    # hängt vllt auch vom Model ab, ratelimits und sleeping times in Abhängigkeit
-    # der Modelle abspeichern (kann man das ggf. auch per GET abfragen?)
-    # ratelimit für falcon relativ niedrig: in etwa 15-20
-    for(i in seq_len(k)){
+  for(i in seq_len(k)){
+    model_output[i] = interact(model = model,
+                               params = params,
+                               prompt = prompts[i],
+                               token = token)[[1]][[1]]
+    while(grepl("rate limit reached", model_output[i], ignore.case = TRUE)){
+      if(as.numeric(difftime(Sys.time(), waited, units = "mins")) > max_wait){
+        max_wait = .ask_user()
+        waited = Sys.time()
+        #Sys.sleep(4*60) #sleep 5 minutes if rate limit is reached
+      }
+      message("\nRate limit reached", appendLF = FALSE)
+      Sys.sleep(60) #sleep 1 minute after each unsuccessful query
+      message(" - try to continue ", appendLF = FALSE)
       model_output[i] = interact(model = model,
                                  params = params,
-                                 prompt = prompts[i])[[1]][[1]]
-      pb$tick()
+                                 prompt = prompts[i],
+                                 token = token)[[1]][[1]]
     }
+    message(" - Success")
+    pb$tick()
   }
   time_end = Sys.time()
 
@@ -103,7 +107,7 @@ label_topics = function(
     prompts = prompts,
     model = model,
     params = params,
-    with_token = with_token,
+    with_token = !(token == ""),
     time = as.numeric(difftime(time_end, time_start, units = "secs")),
     model_output = model_output,
     labels = .extract_labels(model_output)
