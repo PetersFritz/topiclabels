@@ -8,7 +8,7 @@ label_topics(
   terms,
   model = "tiiuae/falcon-7b-instruct",
   params = list(),
-  token,
+  token = NA_character_,
   context = "",
   sep_terms = "; ",
   max_length_label = 5L,

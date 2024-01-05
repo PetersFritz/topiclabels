@@ -12,7 +12,7 @@ interact_with_token = function(model, params, prompt, token){
 }
 
 interact = function(model, params, prompt, token){
-  if(token != "") return(interact_with_token(model = model, params = params,
+  if(!is.na(token)) return(interact_with_token(model = model, params = params,
                                              prompt = prompt, token = token))
   url = paste0("https://api-inference.huggingface.co/models/", model)
   post = POST(url = url,

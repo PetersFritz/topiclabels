@@ -44,7 +44,7 @@ label_topics = function(
     terms,
     model = "tiiuae/falcon-7b-instruct",
     params = list(),
-    token,
+    token = NA_character_,
     context = "",
     sep_terms = "; ",
     max_length_label = 5L,
@@ -54,7 +54,6 @@ label_topics = function(
 
   params = c(params, .default_model_params(model))
   params = params[!duplicated(names(params))]
-  if(missing(token)) token = ""
   if(!is.list(terms)){
     if(is.matrix(terms)) terms = as.list(as.data.frame(terms))
     else terms = list(terms)
