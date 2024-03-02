@@ -42,7 +42,8 @@
 
 label_topics = function(
     terms,
-    model = "tiiuae/falcon-7b-instruct",
+    # model = "tiiuae/falcon-7b-instruct",
+    model = "HuggingFaceH4/zephyr-7b-beta",
     params = list(),
     token = NA_character_,
     context = "",
