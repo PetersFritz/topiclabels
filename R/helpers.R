@@ -1,30 +1,54 @@
 .default_model_params = function(model){
-  if(model == "tiiuae/falcon-7b-instruct")
+  # if(model == "tiiuae/falcon-7b-instruct")
+  if(model == "HuggingFaceH4/zephyr-7b-beta")
     return(list("max_new_tokens" = 300, return_full_text = FALSE))
   return(list())
 }
 
-.extract_labels = function(model_output){
-  model_output_processed = sapply(
-    strsplit(model_output, "\""), function(x)
-      ifelse(length(x) == 3, x[2], NA_character_))
-  ind = is.na(model_output_processed)
-  if(!any(ind))
-    return(model_output_processed)
-  # hier steht aktuell nochmal der gleiche Code. Einfach entsprechend anpassen
-  # z.B. "topic is (related to)" als identifier (regex formulieren)
-  model_output_processed[ind] = sapply(
-    strsplit(model_output[ind], "topic is( related to)* "), function(x)
-      ifelse(length(x) == 2, x[2], NA_character_))
-  # + ggf. dritte "Ebene", falls immer noch NAs
-  ind = is.na(model_output_processed)
-  if(!any(ind))
-    return(model_output_processed)
-  model_output_processed[ind] = sapply(
-    strsplit(model_output[ind], "best label( for the topic)* is "), function(x)
-      ifelse(length(x) == 2, x[2], NA_character_))
-  # ...
+# .extract_labels = function(model_output){
+#   model_output_processed = sapply(
+#     strsplit(model_output, "\""), function(x)
+#       ifelse(length(x) == 3, x[2], NA_character_))
+#   ind = is.na(model_output_processed)
+#   if(!any(ind))
+#     return(model_output_processed)
+#   # hier steht aktuell nochmal der gleiche Code. Einfach entsprechend anpassen
+#   # z.B. "topic is (related to)" als identifier (regex formulieren)
+#   model_output_processed[ind] = sapply(
+#     strsplit(model_output[ind], "topic is( related to)* "), function(x)
+#       ifelse(length(x) == 2, x[2], NA_character_))
+#   # + ggf. dritte "Ebene", falls immer noch NAs
+#   ind = is.na(model_output_processed)
+#   if(!any(ind))
+#     return(model_output_processed)
+#   model_output_processed[ind] = sapply(
+#     strsplit(model_output[ind], "best label( for the topic)* is "), function(x)
+#       ifelse(length(x) == 2, x[2], NA_character_))
+#   # ...
 
+#   model_output_processed
+# }
+
+.extract_labels <- function(model_output) {
+  model_output_processed <- sapply(model_output, function(llm_response) {
+    # extract JSON part using regex, handling multiline JSON structures
+    json_part <- regmatches(llm_response, regexpr("(?s)\\{.*?\\}", llm_response, perl = TRUE))
+    if (length(json_part) == 0) {
+      return(NA)  
+    }
+    # correct escaped quotes for proper JSON parsing
+    json_part <- gsub("\\\\\"", "\"", json_part)
+    # parse JSON, returning NA on error
+    parsed_json <- tryCatch(jsonlite::fromJSON(json_part),
+                            error = function(e) return(NA))
+    # extract and return 'label' field, if present
+    if ("label" %in% names(parsed_json)) {
+      return(parsed_json$label)
+    } else {
+      return(NA)
+    }
+  }) # maybe add "USE.NAMES = FALSE)" to keep output clean
+  
   model_output_processed
 }
 

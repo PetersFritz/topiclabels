@@ -29,6 +29,7 @@ Imports:
 	httr,
 	progress,
 	stats
+    jsonlite
 LazyData: true
 RoxygenNote: 7.2.3
 URL: GITHUB URL
