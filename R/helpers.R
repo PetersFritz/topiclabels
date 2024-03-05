@@ -5,51 +5,48 @@
   return(list())
 }
 
-# .extract_labels = function(model_output){
-#   model_output_processed = sapply(
-#     strsplit(model_output, "\""), function(x)
-#       ifelse(length(x) == 3, x[2], NA_character_))
-#   ind = is.na(model_output_processed)
-#   if(!any(ind))
-#     return(model_output_processed)
-#   # hier steht aktuell nochmal der gleiche Code. Einfach entsprechend anpassen
-#   # z.B. "topic is (related to)" als identifier (regex formulieren)
-#   model_output_processed[ind] = sapply(
-#     strsplit(model_output[ind], "topic is( related to)* "), function(x)
-#       ifelse(length(x) == 2, x[2], NA_character_))
-#   # + ggf. dritte "Ebene", falls immer noch NAs
-#   ind = is.na(model_output_processed)
-#   if(!any(ind))
-#     return(model_output_processed)
-#   model_output_processed[ind] = sapply(
-#     strsplit(model_output[ind], "best label( for the topic)* is "), function(x)
-#       ifelse(length(x) == 2, x[2], NA_character_))
-#   # ...
+.extract_labels_from_plaintext = function(model_output){
+  model_output_processed = sapply(
+    strsplit(model_output, "\""), function(x)
+      ifelse(length(x) == 3, x[2], NA_character_))
+  ind = is.na(model_output_processed)
+  if(!any(ind))
+    return(model_output_processed)
+  # hier steht aktuell nochmal der gleiche Code. Einfach entsprechend anpassen
+  # z.B. "topic is (related to)" als identifier (regex formulieren)
+  model_output_processed[ind] = sapply(
+    strsplit(model_output[ind], "topic is( related to)* "), function(x)
+      ifelse(length(x) == 2, x[2], NA_character_))
+  # + ggf. dritte "Ebene", falls immer noch NAs
+  ind = is.na(model_output_processed)
+  if(!any(ind))
+    return(model_output_processed)
+  model_output_processed[ind] = sapply(
+    strsplit(model_output[ind], "best label( for the topic)* is "), function(x)
+      ifelse(length(x) == 2, x[2], NA_character_))
+  # ...
+  model_output_processed
+}
 
-#   model_output_processed
-# }
-
-.extract_labels <- function(model_output) {
-  model_output_processed <- sapply(model_output, function(llm_response) {
+.extract_labels_from_json = function(model_output) {
+  model_output_processed = sapply(model_output, function(llm_response){
     # extract JSON part using regex, handling multiline JSON structures
-    json_part <- regmatches(llm_response, regexpr("(?s)\\{.*?\\}", llm_response, perl = TRUE))
-    if (length(json_part) == 0) {
-      return(NA)  
+    json_part = regmatches(llm_response, regexpr("(?s)\\{.*?\\}", llm_response, perl = TRUE))
+    if (length(json_part) == 0){
+      return(NA_character_)
     }
     # correct escaped quotes for proper JSON parsing
-    json_part <- gsub("\\\\\"", "\"", json_part)
+    json_part = gsub("\\\\\"", "\"", json_part)
     # parse JSON, returning NA on error
-    parsed_json <- tryCatch(jsonlite::fromJSON(json_part),
-                            error = function(e) return(NA))
+    parsed_json = tryCatch(fromJSON(json_part), error = function(e) return(NA_character_))
     # extract and return 'label' field, if present
-    if ("label" %in% names(parsed_json)) {
+    if ("label" %in% names(parsed_json)){
       return(parsed_json$label)
-    } else {
-      return(NA)
+    }else{
+      return(NA_character_)
     }
   }) # maybe add "USE.NAMES = FALSE)" to keep output clean
-  
-  model_output_processed
+  unname(model_output_processed)
 }
 
 .make_progress_bar = function(progress, ...){

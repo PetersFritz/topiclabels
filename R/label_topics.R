@@ -64,7 +64,7 @@ label_topics = function(
 
   model_output = character(k)
   prompts = sapply(terms, function(x)
-    generate_standard_prompt(
+    generate_standard_prompt_json(
       terms = x,
       context = context,
       sep_terms = sep_terms,
@@ -93,7 +93,7 @@ label_topics = function(
             terms = terms, prompts = prompts, model = model, params = params,
             with_token = !(token == ""),
             time = as.numeric(difftime(time_end, time_start, units = "mins")),
-            model_output = model_output, labels = .extract_labels(model_output)))
+            model_output = model_output, labels = .extract_labels_from_json(model_output)))
         }
         waited = Sys.time()
         message("Wait for five minutes", appendLF = FALSE)
@@ -117,5 +117,5 @@ label_topics = function(
   as.lm_topic_labels(
     terms = terms, prompts = prompts, model = model, params = params, with_token = !(token == ""),
     time = as.numeric(difftime(time_end, time_start, units = "mins")),
-    model_output = model_output, labels = .extract_labels(model_output))
+    model_output = model_output, labels = .extract_labels_from_json(model_output))
 }
