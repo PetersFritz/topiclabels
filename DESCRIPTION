@@ -28,8 +28,8 @@ Imports:
 	checkmate (>= 1.8.5),
 	httr,
 	progress,
-	stats
-    jsonlite
+	stats,
+	jsonlite
 LazyData: true
 RoxygenNote: 7.2.3
 URL: GITHUB URL
