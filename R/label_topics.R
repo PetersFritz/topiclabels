@@ -70,7 +70,7 @@ label_topics = function(
       max_length_label = max_length_label))
   message(paste0(
     sprintf("Labeling %s topic(s) using the language model %s", k, model),
-    ifelse(!(token == ""), " and a Huggingface API token.", ".")))
+    ifelse(!is.na(token), " and a Huggingface API token.", ".")))
   pb = .make_progress_bar(
     progress = progress,
     callback = function(x) message("Labeling process finished"),

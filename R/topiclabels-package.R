@@ -13,4 +13,5 @@
 #' @import checkmate
 #' @import progress
 #' @import httr
+#' @import jsonlite
 "_PACKAGE"
