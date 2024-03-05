@@ -26,7 +26,8 @@ the top terms of a single topic. If a \code{character} matrix is passed,
 each column is interpreted as the top terms of a topic.}
 
 \item{model}{[\code{character(1)}]\cr
-Optional. Default is \code{tiiuae/falcon-7b-instruct}.\cr
+Optional. Default is \code{mistralai/Mixtral-8x7B-Instruct-v0.1}. Other promising
+models are \code{HuggingFaceH4/zephyr-7b-beta} or \code{tiiuae/falcon-7b-instruct}.\cr
 The language model to use for labeling the topics.
 The model must be accessible via the Huggingface API.}
 
@@ -49,7 +50,7 @@ TBA}
 
 \item{max_wait}{[\code{integer(1)}]\cr
 time in minutes after which the user is ask whether to proceed if rate limit
-is reached (default 0 -> user is askes every time the rate limit is reached)}
+is reached (default 0 -> user is asked every time the rate limit is reached)}
 
 \item{progress}{description}
 }

@@ -14,7 +14,8 @@
 #' the top terms of a single topic. If a \code{character} matrix is passed,
 #' each column is interpreted as the top terms of a topic.
 #' @param model [\code{character(1)}]\cr
-#' Optional. Default is \code{tiiuae/falcon-7b-instruct}.\cr
+#' Optional. Default is \code{mistralai/Mixtral-8x7B-Instruct-v0.1}. Other promising
+#' models are \code{HuggingFaceH4/zephyr-7b-beta} or \code{tiiuae/falcon-7b-instruct}.\cr
 #' The language model to use for labeling the topics.
 #' The model must be accessible via the Huggingface API.
 #' @param params [\code{list}]\cr
@@ -30,7 +31,7 @@
 #' @param prompt_type description
 #' @param max_wait [\code{integer(1)}]\cr
 #' time in minutes after which the user is ask whether to proceed if rate limit
-#' is reached (default 0 -> user is askes every time the rate limit is reached)
+#' is reached (default 0 -> user is asked every time the rate limit is reached)
 #' @param progress description
 #'
 #' @return [\code{character(k)}] Labels for all \code{k} topics.
@@ -42,8 +43,7 @@
 
 label_topics = function(
     terms,
-    # model = "tiiuae/falcon-7b-instruct",
-    model = "HuggingFaceH4/zephyr-7b-beta",
+    model = "mistralai/Mixtral-8x7B-Instruct-v0.1",
     params = list(),
     token = NA_character_,
     context = "",
