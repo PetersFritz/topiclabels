@@ -1,8 +1,16 @@
 .default_model_params = function(model){
-  # if(model == "tiiuae/falcon-7b-instruct")
-  if(model == "HuggingFaceH4/zephyr-7b-beta")
+  if(model == "HuggingFaceH4/zephyr-7b-beta" |
+     model == "tiiuae/falcon-7b-instruct" |
+     model == "mistralai/Mixtral-8x7B-Instruct-v0.1")
     return(list("max_new_tokens" = 300, return_full_text = FALSE))
   return(list())
+}
+
+.extract_labels = function(model_output, type = "json"){
+  if (type == "json") f = .extract_labels_from_json
+  else if (type == "plain") f = .extract_labels_from_plaintext
+  else if (type == "json-roles") f = "not implemented yet!"
+  f(model_output)
 }
 
 .extract_labels_from_plaintext = function(model_output){
@@ -45,7 +53,7 @@
     }else{
       return(NA_character_)
     }
-  }) # maybe add "USE.NAMES = FALSE)" to keep output clean
+  })
   unname(model_output_processed)
 }
 

@@ -28,7 +28,8 @@
 #' @param context description example
 #' @param sep_terms description
 #' @param max_length_label description
-#' @param prompt_type description
+#' @param prompt_type [\code{character(1)}]\cr
+#' description
 #' @param max_wait [\code{integer(1)}]\cr
 #' time in minutes after which the user is ask whether to proceed if rate limit
 #' is reached (default 0 -> user is asked every time the rate limit is reached)
@@ -49,10 +50,11 @@ label_topics = function(
     context = "",
     sep_terms = "; ",
     max_length_label = 5L,
-    prompt_type = 1L,
+    prompt_type = c("json", "plain", "json-roles"),
     max_wait = 0L,
     progress = TRUE){
 
+  prompt_type = match.arg(prompt_type)
   params = c(params, .default_model_params(model))
   params = params[!duplicated(names(params))]
   if(!is.list(terms)){
@@ -64,11 +66,12 @@ label_topics = function(
 
   model_output = character(k)
   prompts = sapply(terms, function(x)
-    generate_standard_prompt_json(
+    generate_standard_prompt(
       terms = x,
       context = context,
       sep_terms = sep_terms,
-      max_length_label = max_length_label))
+      max_length_label = max_length_label,
+      type = prompt_type))
   message(paste0(
     sprintf("Labeling %s topic(s) using the language model %s", k, model),
     ifelse(!is.na(token), " and a Huggingface API token.", ".")))
@@ -93,7 +96,7 @@ label_topics = function(
             terms = terms, prompts = prompts, model = model, params = params,
             with_token = !(token == ""),
             time = as.numeric(difftime(time_end, time_start, units = "mins")),
-            model_output = model_output, labels = .extract_labels_from_json(model_output)))
+            model_output = model_output, labels = .extract_labels(model_output, type = prompt_type)))
         }
         waited = Sys.time()
         message("Wait for five minutes", appendLF = FALSE)
@@ -117,5 +120,5 @@ label_topics = function(
   as.lm_topic_labels(
     terms = terms, prompts = prompts, model = model, params = params, with_token = !(token == ""),
     time = as.numeric(difftime(time_end, time_start, units = "mins")),
-    model_output = model_output, labels = .extract_labels_from_json(model_output))
+    model_output = model_output, labels = .extract_labels(model_output, type = prompt_type))
 }
