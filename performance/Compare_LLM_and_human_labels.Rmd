@@ -1,0 +1,858 @@
+---
+title: 'topiclabels: An R Package for Automated Topic Labeling Using Large Language
+  Models'
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_depth: 3
+---
+
+# Summary
+
+Our proposed R package leverages Large Language models (LLM) for automatic topic labeling. The main function `label_topics()` takes a list of top terms as input and generates a label for each topic. Hence, it is complementary to any topic modeling package that produces a list of top terms for each topic.
+
+While human judgement is indispensable for topic validation (i.e., inspecting top terms and most representative documents), automatic topic labeling can be a valuable tool for researchers in scenarios such as:
+
+1.  A **large number of topics** need to be labeled (e.g., topic models with thousands of topics, models with changing topic content over time (see [RollingLDA](https://github.com/JonasRieger/rollinglda)), or for evaluating the results for many different values of *k*)
+2.  The LLM can provide a **first approximation** of the topic, which can then be refined by human coders.
+3.  It may also be of help as a **second opinion** in cases where human coders disagree or to identify topics that are hard to interpret.
+
+Hence, the goal of the proposed package is not to replace human judgment and validation to topic modeling results, but to support researchers during this process.
+
+Currently, the HuggingFace API is used to access the LLM. The default model is [`mistralai/Mixtral-8x7B-Instruct-v0.1`](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1), but the user can also specify other models.
+
+In the following, we compare the automatically generated topic labels with the labels of human coders published in various topic modeling studies.
+
+_Note:_ Generative AI (i.e., GitHub Copilot) was used for coding assistance.
+
+# Setup
+
+## Set file path
+
+```{r}
+path <- "U:/R Projekte/topiclabels/performance"
+```
+
+## Load the package and API token
+
+```{r warning=FALSE}
+# https://github.com/PetersFritz/topiclabels
+devtools::load_all()
+
+# The package is best used with a (free) HuggingFace token
+# https://huggingface.co/docs/hub/security-tokens
+hf_token <- readLines("U:/R Projekte/HuggingFace_token.txt")
+```
+
+## Examples
+
+The following examples illustrate how to use the `label_topics()` function:
+
+```{r}
+# Label two topics with a token:
+label_topics(list("tree, plants, wood, fox, forest", "weapon, gun, sniper"), token = hf_token)
+```
+
+```{r}
+# Specify the LLM to be used
+label_topics(list("tree, plants, wood, fox, forest", "weapon, gun, sniper"), model = "HuggingFaceH4/zephyr-7b-beta", token = hf_token)
+```
+
+```{r}
+# Provide the topical context of the corpus
+label_topics(list("tree, plants, wood, fox, forest", "weapon, gun, sniper"), context = "Second World War", token = hf_token)
+```
+
+# Comparison with human labels
+
+To evaluate the performance of the `label_topics()` function, we compare the automatically generated labels with human labels from various studies. Inclusion criteria for the studies were:
+
+-   Top terms and human labels are provided
+-   English language
+
+## Retrieve human labels
+
+The topics labeled by humans were taken from the following studies:
+
+-   **Bittermann et al.** [(2023](https://doi.org/10.1007/s10648-023-09775-9). Context: Research on prior knowledge and learning in the fields of psychology and educational science.
+-   **Li et al.** [(2023](https://doi.org/10.31235/osf.io/23x4m). Context: Sociology.
+-   **Weber** [(2021)](https://doi.org/10.1177/21582440211061567). Context: How 50-year-olds imagine their future.
+-   **Kwon & Nguyen** [(2023)](https://doi.org/10.1177/0739456X231156827). Context: Racial equity in urban planning.
+-   **Sharma et al.** [(2021)](https://doi.org/10.1016/j.ijinfomgt.2021.102316). Context: Information Management
+-   **Phillips et al.** [(2023)](https://doi.org/10.1016/j.socscimed.2023.116144). Context: Suicide
+-   **Tonidandel et al.** [(2022)](https://doi.org/10.1016/j.leaqua.2021.101576). Context: Leadership
+-   **Dwivedi et al.** [(2023)](https://doi.org/10.1016/j.techfore.2023.122579). Context: Artificial Intelligence
+-   **Heiberger et al.** [(2021)](https://doi.org/10.1177/00031224211056267). Context: Effects of specialization on academic career success
+
+We provide all labels and top terms of the original studies in [Table_human_labels](https://docs.google.com/spreadsheets/d/1UcumvMI-j4ehNUVF-_DWc5cdkOsM8QbTGOPJ10wGZTw/edit?usp=sharing).
+
+```{r message=FALSE, warning=FALSE}
+# Load table with human labels
+library(googlesheets4)
+gs4_deauth() # no authentication needed for public sheets
+human_labels <- read_sheet("1UcumvMI-j4ehNUVF-_DWc5cdkOsM8QbTGOPJ10wGZTw")
+human_labels
+```
+
+# Topic labeling with LLM
+
+## Standard labeling
+
+```{r eval=FALSE, echo=TRUE}
+LLM_labels <- label_topics(as.list(human_labels$Top_Terms), token = hf_token)
+
+# save
+saveRDS(LLM_labels, file = paste0(path, "/LLM_labels.RDS"))
+```
+
+```{r include=FALSE}
+# load
+LLM_labels <- readRDS(paste0(path, "/LLM_labels.RDS"))
+```
+
+```{r}
+# Compare results
+example <- cbind(head(human_labels$Human_Label, 10), head(LLM_labels$labels, 10))
+colnames(example) <- c("Human_Label", "LLM_Label")
+example
+```
+
+### Compute similarity of label sentence embeddings
+
+To quantify the similarity between the human labels and the labels generated by the LLM, we use the [`llmrails/ember-v1`](https://huggingface.co/llmrails/ember-v1) model to transform each label into a sentence embedding. We then calculate the cosine similarity between the embeddings of the human labels and the LLM labels.
+
+The following function retrieves the sentence embeddings for a given list of labels using the HuggingFace API:
+
+```{r}
+# compare semantic similarity of labels using sentence embeddings
+# using the HuggingFace API and the code from:
+# https://github.com/AndreasFischer1985/code-snippets/blob/master/R/huggingface_SentenceEmbeddingsTest.R
+
+get_embeddings <- function(prompts, model_id = "llmrails/ember-v1", api_token = hf_token) {
+  
+  require("httr")
+  e=list()
+  t0=Sys.time()
+  e=list()
+  
+  for(i in 1:length(prompts)){
+    print(paste0(i,"/",length(prompts)," started at ",Sys.time()))
+    payload=prompts[i]
+    #payload = "Roses are red"
+    url=paste0("https://api-inference.huggingface.co/models/",model_id)
+    post=httr::POST(url=url, body=list("inputs"= payload), 
+    	httr::add_headers(.headers=c("X-Wait-For-Model"="true","X-Use-Cache"="false")),	
+  	httr::add_headers(.headers=c("Authorization"=paste("Bearer",api_token))),
+   	encode="json")
+    x=httr::content(post)
+    print(length(x[[1]][[1]]))
+    e[[i]]=x
+  }
+  
+  t1=Sys.time()
+  t1-t0
+  #sapply(e,length) 
+  
+  sentenceEmbeddings = lapply(e,function(f){
+    #x=do.call(cbind,f[[1]])
+    #x=apply(x,2,as.numeric)
+    #rowMeans(x) # Mean-Pooling der Token-Embeddings
+    unlist(f)
+  })
+  embeddings_a_4=do.call(rbind,sentenceEmbeddings)
+  
+  return(embeddings_a_4)
+  
+}
+  
+```
+
+```{r eval=FALSE, echo=TRUE}
+# get embeddings
+human_labels_embeddings <- get_embeddings(human_labels$Human_Label)
+LLM_labels_embeddings <- get_embeddings(LLM_labels$labels)
+
+# save
+saveRDS(human_labels_embeddings, file = paste0(path, "/human_labels_embeddings.RDS"))
+saveRDS(LLM_labels_embeddings, file = paste0(path, "/LLM_labels_embeddings.RDS"))
+```
+
+```{r include=FALSE}
+# load
+human_labels_embeddings <- readRDS(paste0(path, "/human_labels_embeddings.RDS"))
+LLM_labels_embeddings <- readRDS(paste0(path, "/LLM_labels_embeddings.RDS"))
+```
+
+```{r}
+# compute pairwise cosine similarity
+sims <- vector()
+for (i in 1:nrow(human_labels_embeddings)){
+  sims[i] <- lsa::cosine(as.numeric(human_labels_embeddings[i,]), as.numeric(LLM_labels_embeddings[i,]))
+}
+  
+```
+
+```{r}
+# result data frame
+res <- data.frame(Study = human_labels$Study,
+                  Topic_Number = human_labels$Topic_Number,
+                  Human_Label = human_labels$Human_Label,
+                  LLM_Label = LLM_labels$labels,
+                  Similarity = sims)
+```
+
+### Overall similarity
+
+```{r}
+summary(res$Similarity)
+```
+Overall, the mean cosine similarity between the human labels and the LLM labels is `r round(mean(res$Similarity), 2)`, indicating a moderate similarity between the two sets of labels. At least one human label was perfectly matched by the LLM (cosine similarity = 1), while the lowest similarity was `r round(min(res$Similarity), 2)`.
+
+Let's have a closer look at the performance for the different studies:
+
+### Results by study
+
+```{r}
+# show mean cosine similarity by study
+aggregate(Similarity ~ Study, data = res, FUN = mean)
+
+```
+
+```{r}
+library(ggplot2)
+ggplot(res, aes(x = Study, y = Similarity, fill = Study)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1, fill = "white") +
+  scale_fill_brewer(palette = "Set3") + # Use a predefined color palette
+  theme_minimal() +
+  labs(title = paste("Similarity of human and LLM labels by study. Mean Cos. Sim. = ", round(mean(res$Similarity), 2)),
+       subtitle = "Original human labels and no context provided",
+       x = "Study",
+       y = "Cosine similarity") +
+  guides(fill = "none") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+    
+As we can see, there is variation in the similarity between human and LLM labels across the different studies. Some studies show higher similarity than others, indicating that the LLM's performance may vary depending on the topic - or the quality of the human labels.
+
+### Comparison with ChatGPT-generated Labels in Li et al. (2023)
+
+Li et al. (2023) used ChatGPT to generate labels for the same topics. Let's compare their results with our LLM labels.
+
+```{r}
+# ChatGPT labels, see https://doi.org/10.31235/osf.io/23x4m
+Li_chatgpt <- c(
+  "Indie Rock Music",
+  "Political Transformation",
+  "Syrian conflict and extremist groups",
+  "Storytelling or Narration",
+  "Activism and Resistance",
+  "Financial Risk and Instability",
+  "Monetary policy tools and actions of the Federal Reserve",
+  "Financial performance",
+  "Cultural and political discourse in global and local contexts",
+  "Wildlife or Nature",
+  "Insurance industry",
+  "Winter weather and climate forecasts",
+  "Government and Legislative Affairs",
+  "Social structure and organization in communities and groups",
+  "Golf course geography and topography",
+  "Technology companies and outdoor activities",
+  "Corporate Finance/Earnings Report",
+  "Afghan War and Politics",
+  "Islamic Jihad and its pillars",
+  "Conspiracy theories surrounding QAnon movement and the COVID-19 pandemic"
+)
+
+```
+
+```{r eval=FALSE, echo=TRUE}
+# Create embeddings
+Li_chatgpt_embeddings <- get_embeddings(Li_chatgpt)
+saveRDS(Li_chatgpt_embeddings, file = paste0(path, "/Li_chatgpt_embeddings.RDS"))
+```
+
+```{r include=FALSE}
+# load
+Li_chatgpt_embeddings <- readRDS(paste0(path, "/Li_chatgpt_embeddings.RDS"))
+```
+
+```{r}
+# Compute similarities with LLM_labels
+ind_Li <- which(human_labels$Study == "Li 2023")
+LLM_labels_embeddings_Li <- LLM_labels_embeddings[ind_Li,]
+human_labels_embeddings_Li <- human_labels_embeddings[ind_Li,]
+
+sims_LLM_chatgpt <- vector()
+for (i in 1:nrow(Li_chatgpt_embeddings)){
+  sims_LLM_chatgpt[i] <- lsa::cosine(as.numeric(Li_chatgpt_embeddings[i,]), as.numeric(LLM_labels_embeddings_Li[i,]))
+}
+
+sims_human_chatgpt <- vector()
+for (i in 1:nrow(Li_chatgpt_embeddings)){
+  sims_human_chatgpt[i] <- lsa::cosine(as.numeric(Li_chatgpt_embeddings[i,]), as.numeric(human_labels_embeddings_Li[i,]))
+}
+
+```
+
+```{r}
+# violin plot of similarities
+res_Li <- data.frame(Human_Label = human_labels$Human_Label[ind_Li],
+                      ChatGPT_Label = Li_chatgpt,
+                      LLM_Label = LLM_labels$labels[ind_Li],
+                      Similarity_LLM_ChatGPT = sims_LLM_chatgpt,
+                      Similarity_Human_ChatGPT = sims_human_chatgpt,
+                      Similarity_Human_LLM = sims[ind_Li])
+```
+
+```{r}
+# Create a data frame with the vectors
+data <- data.frame(
+  Group = c(rep("Li et al. (ChatGPT)", length(sims_human_chatgpt)), 
+            rep("Our approach", length(sims[ind_Li]))),
+  Value = c(sims_human_chatgpt, sims[ind_Li])
+)
+
+# violin plot
+ggplot(data, aes(x = Group, y = Value, fill = Group)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1, fill = "white") +
+  scale_fill_brewer(palette = "Set3") + # Use a predefined color palette
+  theme_minimal() +
+  labs(title = "Similarity with human labels",
+       subtitle = " ChatGPT labels by Li et al. (2023) vs. our LLM labels",
+       x = "LLM",
+       y = "Cosine similarity") +
+  guides(fill = "none") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+While ChatGPT in Li et al. gave a perfect match with one human label, the overall similarity with human labels is higher in our LLM approach. This indicates that the LLM is better at capturing the semantics of the human labels than ChatGPT.
+
+### Examples of low similarity
+
+Regarding the varying performance, one has to keep in mind that labels provided by the authors do not necessarily have to be the best possible labels. Let's have a look at some examples of low similarity between humans and the LLM.
+
+```{r}
+# show examples of low similarity
+res_low <- res[order(res$Similarity), c("Human_Label", "LLM_Label", "Similarity", "Study", "Topic_Number")]
+example <- cbind(res_low$Human_Label, res_low$LLM_Label, round(res_low$Similarity, 3))[1:10, ]
+colnames(example) <- c("Human_Label", "LLM_Label", "Similarity")
+example
+
+```
+
+As we can observe, some human labels are obviously not very informative or specific, e.g. "div. activity" or "health1", or indicate a topic that is not interpretable ("Noise"). This is a limitation of the human labels and not necessarily a limitation of the LLM. Moreover, some human labels can be better understood in the context of the study (e.g., "Past Health Trauma"). Hence, we can
+
+1.  identify and omit non-informative human labels, and
+2.  try to improve the performance of the LLM by providing additional context.
+
+## Removal of non-informative human labels
+
+### Human rating of label informativeness
+
+To identify non-informative human labels, a human rater assessed the informativeness of the human labels. Specifically, labels were compared with the provided top terms and rated on a scale from 0 (= not at all informative) to 4 (= very informative). Let's see which labels are considered non-informative.
+
+```{r}
+# table of rating results
+table(human_labels$label_rating)
+```
+We will consider labels with a rating of 0 and 1 as non-informative, in total `r sum(human_labels$label_rating == 0) + sum(human_labels$label_rating == 1)` labels.
+
+```{r}
+# show labels with informativeness = 0
+res[which(human_labels$label_rating == 0),]
+
+```
+
+The mean similarity of these labels is `r round(mean(res[which(human_labels$label_rating == 0),]$Similarity), 3)`. We can see that the mean similarity of these labels is lower than the mean similarity of all labels, which is `r round(mean(res$Similarity), 3)`.
+
+```{r}
+# show labels with informativeness = 1
+res[which(human_labels$label_rating == 1),]
+
+```
+ 
+The mean similarity of these labels is `r round(mean(res[which(human_labels$label_rating == 1),]$Similarity), 3)`. We can see that the mean similarity of these labels is also lower than the mean similarity of all labels, which is `r round(mean(res$Similarity), 3)`.
+
+### Similarity results without non-informative labels
+
+```{r}
+# indices of low informative human labels
+ind_low_informative <- which(human_labels$label_rating %in% c(0, 1))
+
+# result table without these labels
+res_low_removed <- res[-ind_low_informative,]
+
+```
+
+### Overall similarity
+
+```{r}
+summary(res_low_removed$Similarity)
+```
+As we can see, the removal of non-informative labels increases the mean similarity of human and LLM labels from `r round(mean(res$Similarity), 3)` to `r round(mean(res_low_removed$Similarity), 3)`.
+
+### Comparing violin plots
+
+```{r}
+library(ggplot2)
+
+# Add a grouping variable to each dataset
+res$Group <- "All Labels"
+res_low_removed$Group <- "Informative-only"
+
+# Combine the datasets
+combined_data <- rbind(res, res_low_removed)
+
+# Plot combined data
+ggplot(combined_data, aes(x = Study, y = Similarity, fill = Group)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1, fill = "white") +
+  scale_fill_manual(values = c("All Labels" = "cornflowerblue", "Informative-only" = "darkgreen")) + 
+  theme_minimal() +
+  labs(title = "Similarity of human and LLM labels by study",
+       # subtitle = "Comparison of informative-only vs. all human labels",
+       x = "Study",
+       y = "Cosine similarity") +
+  facet_wrap(~ Group, scales = "free") +  # Facet by the grouping variable
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  guides(fill = "none")
+
+```
+Studies with most non-informative labels were Li 2023 and Weber 2021 (see table above). This is reflected in their violin plots.
+
+## Labeling with context information
+
+To improve the performance of the LLM, we can provide additional context information to the LLM. This context information can be the overall subject of the corpus. Let's label the topics with the top terms as context information.
+
+```{r}
+# vector of all contexts (in same order as studies in human_labels)
+context <- c("Research on prior knowledge and learning in the fields of psychology and educational science", 
+             "Sociology", 
+             "How 50-year-olds imagine their future", 
+             "Racial equity in urban planning", 
+             "Information Management", 
+             "Suicide", 
+             "Leadership", 
+             "Artificial Intelligence", 
+             "Effects of specialization on academic career success")
+
+```
+
+```{r eval=FALSE, echo=TRUE}
+# run label_topics separately for each study
+
+LLM_labels_context <- list()
+
+for (i in 1:length(context)){
+  
+  # terms of each study
+  study <- unique(human_labels$Study)[i]
+  input <- human_labels$Top_Terms[human_labels$Study == study]
+  
+  # label_topics with context
+  LLM_labels_context[[i]] <- label_topics(as.list(input), context = context[i], token = hf_token)
+}
+
+# save
+LLM_labels_context <- saveRDS(LLM_labels_context, file = paste0(path, "/LLM_labels_context.RDS"))
+
+```
+
+```{r include=FALSE}
+# load
+LLM_labels_context <- readRDS(paste0(path, "/LLM_labels_context.RDS"))
+```
+
+### Compute similarity of label sentence embeddings
+
+```{r}
+# get labels from list object
+LLM_labels_context_labels <- unlist(lapply(LLM_labels_context, function(x){
+  x$labels
+}))
+```
+
+```{r eval=FALSE, echo=TRUE}
+# get embeddings
+LLM_labels_context_embeddings <- get_embeddings(LLM_labels_context_labels)
+
+# save
+saveRDS(LLM_labels_context_embeddings, file = paste0(path, "/LLM_labels_context_embeddings.RDS"))
+```
+
+```{r include=FALSE}
+# load
+LLM_labels_context_embeddings <- readRDS(paste0(path, "/LLM_labels_context_embeddings.RDS"))
+```
+
+```{r}
+# compute pairwise cosine similarity
+sims_context <- vector()
+for (i in 1:nrow(human_labels_embeddings)){
+  sims_context[i] <- lsa::cosine(as.numeric(human_labels_embeddings[i,]), as.numeric(LLM_labels_context_embeddings[i,]))
+}
+  
+```
+
+```{r}
+# result data frame
+res_context <- data.frame(Study = human_labels$Study,
+                  Topic_Number = human_labels$Topic_Number,
+                  Human_Label = human_labels$Human_Label,
+                  LLM_Label_context = LLM_labels_context_labels,
+                  Similarity = sims_context)
+```
+
+### Overall similarity
+
+**With Context**:
+
+```{r}
+summary(res_context$Similarity)
+```
+
+The context improved the performance in contrast to the previous results:
+
+**Without Context**:
+
+```{r}
+summary(res$Similarity)
+```
+
+**Informative Labels only**:
+
+```{r}
+summary(res_low_removed$Similarity)
+```
+
+### Results by study
+
+```{r}
+# show mean cosine similarity by study
+temp_res <- aggregate(Similarity ~ Study, data = res, FUN = mean)
+temp_res_context <- aggregate(Similarity ~ Study, data = res_context, FUN = mean)
+temp <- cbind(temp_res, temp_res_context[,2])
+names(temp)[2:3] <- c("Similarity w/o Context", "Similarity w/ Context")
+temp
+```
+
+As we can see, providing context improves performance in all studies except for Kwon 2023. Let's have a look at these topic labels:
+
+```{r}
+# show labels of Kwon 2023
+res_context[res_context$Study == "Kwon 2023",3:4]
+```
+
+Obviously, the LLM used the provided context as label for all topics. Let's try a different context phrasing for these topics:
+
+```{r}
+# label_topics with context
+Kwon_input <- human_labels$Top_Terms[human_labels$Study == "Kwon 2023"]
+# Kwon_context <- "Racial equity in urban planning" # original context
+Kwon_context <- "Racial Equity and Justice in Urban Studies and Planning"
+Kwon_labels <- label_topics(as.list(Kwon_input), context = Kwon_context, token = hf_token)
+Kwon_labels
+```
+
+While most topics still have the same label, two topics have changed. Adjusting the context can improve the topic label.
+
+### Comparing violin plots
+
+```{r}
+library(ggplot2)
+
+# Add a grouping variable to each dataset
+res$Group <- "Without Context"
+res_context$Group <- "With Context"
+
+# allign names
+names(res_context) <- names(res)
+
+# Combine the datasets
+combined_data <- rbind(res, res_context)
+
+# Plot combined data
+ggplot(combined_data, aes(x = Study, y = Similarity, fill = Group)) +
+  geom_violin() +
+  geom_boxplot(width = 0.1, fill = "white") +
+  scale_fill_manual(values = c("Without Context" = "cornflowerblue", "With Context" = "orange")) + 
+  theme_minimal() +
+  labs(title = "Similarity of human and LLM labels by study",
+       # subtitle = "Comparison of informative-only vs. all human labels",
+       x = "Study",
+       y = "Cosine similarity") +
+  facet_wrap(~ Group, scales = "free") +  # Facet by the grouping variable
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  guides(fill = "none")
+
+```
+
+The violin plots indicate that the context information improved the performance of the LLM, but single topics are less similar to the human labels than without context.
+
+# Conclusion
+
+Overall, the topics generated by the LLM show a satisfactory similarity to the human labels, especially when omitting non-informative human labels. The context information improved the performance of the LLM in most studies. However, the LLM sometimes used the context information as label for all topics.
+
+Automated topic labels can be a valuable tool for researchers to quickly get an overview of the topics in a corpus. However, the LLM-generated labels should be used with caution and only as complementary tool to human judgement and proper topic validation.
+
+# How to use the topiclabels package with other topic modeling packages
+
+Our proposed R package can be used with other topic modeling packages as well. The only requirement is that the topic modeling package provides a function to extract the top terms of each topic. The user can then provide these top terms to the `label_topics` function. The `label_topics` function will then generate the topic labels based on the provided top terms.
+
+In the following, we will illustrate this for different popular R packages (see Wiedemann, 2002, http://dx.doi.org/10.5771/1615-634X-2022-3-286)
+
+## topicmodels
+
+We use the example from the package vignette: https://cran.r-project.org/web/packages/topicmodels/vignettes/topicmodels.pdf
+
+```{r eval=FALSE, echo=TRUE}
+# load data
+library(topicmodels)
+data("JSS_papers", package = "topicmodels")
+
+# transform to corpus
+library(tm)
+corpus <- Corpus(VectorSource(unlist(JSS_papers[, "description"])))
+JSS_dtm <- DocumentTermMatrix(corpus,
+ control = list(stemming = TRUE, stopwords = TRUE, minWordLength = 3,
+ removeNumbers = TRUE, removePunctuation = TRUE))
+```
+
+```{r eval=FALSE, echo=TRUE}
+# run topic model
+jss_TM <- LDA(JSS_dtm, k = 30, control = list(seed = 2010))
+
+# save
+saveRDS(jss_TM, file = paste0(path, "/jss_TM.RDS"))
+```
+
+```{r include=FALSE}
+# load
+jss_TM <- readRDS(paste0(path, "/jss_TM.RDS"))
+```
+
+```{r}
+# get topics
+topics_topicmodels <- topicmodels::terms(jss_TM, 5)
+topics_topicmodels[,1:5]
+```
+First, we transform the output to vectors of top terms.
+
+```{r}
+# transform topics to list of vectors
+topicmodels2tl <- function(x){
+  unname(apply(x, 2, paste, collapse = ", "))
+}
+
+topics_topicmodels_vectors <- topicmodels2tl(topics_topicmodels[,1:5])
+```
+
+Next, these top terms are used as input for our `label_topics` function.
+
+```{r}
+# label_topics
+labels_topicmodels <- label_topics(as.list(topics_topicmodels_vectors), context = "Journal of Statistical Software", token = hf_token)
+
+labels_topicmodels
+```
+
+## stm
+
+We use the example from the package vignette: https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf
+
+```{r eval=FALSE, echo=TRUE}
+data <- read.csv("https://raw.githubusercontent.com/dondealban/learning-stm/master/data/poliblogs2008.csv")
+```
+
+```{r eval=FALSE, echo=TRUE}
+# preprocessing
+library(stm)
+processed <- textProcessor(data$documents, metadata = data)
+```
+```{r eval=FALSE, echo=TRUE}
+# corpus preparation
+out <- prepDocuments(processed$documents, processed$vocab, processed$meta, lower.thresh = 15)
+```
+
+```{r eval=FALSE, echo=TRUE}
+# stm topic model
+poliblogPrevFit <- stm(documents = out$documents, vocab = out$vocab,
+ K = 20, prevalence =~ rating + s(day),
+ max.em.its = 75, data = out$meta,
+ init.type = "Spectral")
+
+# save
+saveRDS(poliblogPrevFit, file = paste0(path, "/poliblogPrevFit.RDS"))
+```
+
+```{r include=FALSE}
+# load
+poliblogPrevFit <- readRDS(paste0(path, "/poliblogPrevFit.RDS"))
+```
+
+```{r}
+# get topics
+topics_stm <- stm::labelTopics(poliblogPrevFit)
+
+# show the topics 3, 7, and 20 (as in vignette)
+stm::labelTopics(poliblogPrevFit, c(3, 7, 20))
+```
+
+First, we transform the output to vectors of top terms (using the most probable terms "prob").
+
+```{r}
+# transform topics to list of vectors
+stm2tl <- function(x, type = "prob"){
+  
+  if (type == "prob"){res <- apply(x$prob, 1, paste, collapse = ", ")}
+  if (type == "frex"){res <- apply(x$frex, 1, paste, collapse = ", ")}
+  if (type == "lift"){res <- apply(x$lift, 1, paste, collapse = ", ")}
+  if (type == "score"){res <- apply(x$score, 1, paste, collapse = ", ")}
+  
+  return(res)
+ 
+}
+
+topics_stm_vectors <- stm2tl(topics_stm)
+```
+
+Next, these top terms are used as input for our `label_topics` function.
+
+```{r}
+# label_topics
+labels_stm <- label_topics(as.list(topics_stm_vectors), context = "blogposts about American
+politics", token = hf_token)
+
+labels_stm
+```
+Interestingly, two topics have not been labeled: Topics 12 and 13. Let's see if it works without context:
+
+```{r}
+labels_stm_nocontext <- label_topics(as.list(topics_stm_vectors), token = hf_token)
+labels_stm_nocontext
+```
+Now all topics are labeled. In the package [vignette](https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf) (page 19), Topic 3 is labeled as "Obama", Topic 7 as "Sarah Palin", and Topic 20 as "Bush Presidency". This matches our topic labels very well:
+
+```{r}
+labels_stm_nocontext$labels[c(3,7,20)]
+```
+
+## BTM
+
+We use the example from the package reference manual: https://cran.r-project.org/web/packages/BTM/BTM.pdf
+
+```{r eval=FALSE, echo=TRUE}
+# load data
+library(udpipe)
+data("brussels_reviews_anno", package = "udpipe")
+
+# prepare data
+x <- subset(brussels_reviews_anno, language == "nl")
+x <- subset(x, xpos %in% c("NN", "NNP", "NNS"))
+x <- x[, c("doc_id", "lemma")]
+
+```
+
+```{r eval=FALSE, echo=TRUE}
+library(BTM)
+set.seed(123456)
+BTM_model <- BTM(x, k = 5, alpha = 1, beta = 0.01, iter = 10, trace = TRUE)
+
+saveRDS(BTM_model, file = paste0(path, "/BTM_model.RDS"))
+
+topics_btm <- terms(BTM_model) # causes issues when knitting, thus saved here and loaded below
+saveRDS(topics_btm, file = paste0(path, "/topics_btm.RDS"))
+```
+
+```{r include=FALSE}
+# load
+BTM_model <- readRDS(paste0(path, "/BTM_model.RDS"))
+topics_btm <- readRDS(paste0(path, "/topics_btm.RDS"))
+```
+
+```{r eval=FALSE, echo=TRUE}
+# get topic terms
+topics_btm <- terms(BTM_model)
+```
+
+```{r}
+# show topic 1
+topics_btm[[1]]
+```
+
+First, we transform the output to vectors of top terms.
+
+```{r}
+# transform topics to list of vectors
+btm2tl <- function(x){
+  unlist(lapply(x, function(y){paste(y$token, collapse = ", ")}))
+}
+
+topics_btm_vectors <- btm2tl(topics_btm)
+```
+
+Next, these top terms are used as input for our `label_topics` function.
+
+```{r}
+# label_topics
+labels_btm <- label_topics(as.list(topics_btm_vectors), context = "Reviews of AirBnB customers on Brussels address locations", token = hf_token)
+
+labels_btm 
+```
+
+As we can see, the LLM `mistralai/Mixtral-8x7B-Instruct-v0.1` can also handle Dutch top terms and generates English labels. The labels are relatively similar, but so are the top terms of the BTM example data.
+
+## ldaPrototype
+
+We use the example from the package GitHub repository: https://github.com/JonasRieger/ldaPrototype
+
+```{r eval=FALSE, echo=TRUE, message=FALSE}
+# load data
+library(ldaPrototype)
+data(reuters_docs)
+data(reuters_vocab)
+```
+
+```{r eval=FALSE, echo=TRUE, message=FALSE}
+# ldaPrototype topic model
+res = LDAPrototype(docs = reuters_docs, vocabLDA = reuters_vocab, n = 4, K = 10, seeds = 1:4)
+
+# save
+saveRDS(res, file = paste0(path, "/res.RDS"))
+```
+
+```{r include=FALSE}
+# load
+res <- readRDS(paste0(path, "/res.RDS"))
+```
+
+```{r}
+# get topics
+library(ldaPrototype)
+topics_ldaproto <- tosca::topWords(getTopics(getLDA(res)), 10)
+
+```
+
+First, we transform the output to vectors of top terms.
+
+```{r}
+# transform topics to list of vectors
+ldaproto2tl <- function(x){
+  unname(apply(x, 2, paste, collapse = ", "))
+}
+
+topics_ldaproto_vectors <- ldaproto2tl(topics_ldaproto)
+```
+
+Next, these top terms are used as input for our `label_topics` function.
+
+```{r}
+# label_topics
+labels_ldaproto <- label_topics(as.list(topics_ldaproto_vectors), context = "Reuters news data", token = hf_token)
+
+labels_ldaproto
+```
