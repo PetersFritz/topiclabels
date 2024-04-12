@@ -422,6 +422,7 @@ ggplot(combined_data, aes(x = Study, y = Similarity, fill = Group)) +
   guides(fill = "none")
 
 ```
+  
 Studies with most non-informative labels were Li 2023 and Weber 2021 (see table above). This is reflected in their violin plots.
 
 ## Labeling with context information
@@ -557,8 +558,6 @@ Kwon_context <- "Racial Equity and Justice in Urban Studies and Planning"
 Kwon_labels <- label_topics(as.list(Kwon_input), context = Kwon_context, token = hf_token)
 Kwon_labels
 ```
-
-While most topics still have the same label, two topics have changed. Adjusting the context can improve the topic label.
 
 ### Comparing violin plots
 
