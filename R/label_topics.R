@@ -105,10 +105,10 @@ label_topics = function(
   # checkmate tests
   assert_list(terms, types = "character", any.missing = FALSE, len = k)
   for(i in seq_along(terms)){
-    assert_character(terms[i], any.missing = FALSE)
+    assert_character(terms[[i]], any.missing = FALSE)
   }
   assert_character(model, len = 1, any.missing = FALSE)
-  assert_list(params, types = "character", any.missing = FALSE)
+  assert_list(params, any.missing = FALSE, names = "unique")
   assert_character(token, len = 1)
   assert_character(context, len = 1, any.missing = FALSE)
   assert_character(sep_terms, len = 1, any.missing = FALSE)
