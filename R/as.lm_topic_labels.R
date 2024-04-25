@@ -124,6 +124,12 @@ is.lm_topic_labels = function(obj, verbose = FALSE){
     return(FALSE)
   }
   n = length(obj$terms)
+  for(i in seq_along(obj$terms)){
+    if (!test_character(obj$terms[i], any.missing = FALSE)){
+      if (verbose) check_character(obj$terms[i], any.missing = FALSE)
+      return(FALSE)
+    }
+  }
   if (!test_character(obj$prompts, len = n)){
     if (verbose) check_character(obj$prompts, len = n)
     return(FALSE)

@@ -101,7 +101,21 @@ label_topics = function(
     else terms = list(terms)
   }
   k = length(terms)
-  # checkmate terms, params, token, ...
+
+  # checkmate tests
+  assert_list(terms, types = "character", any.missing = FALSE, len = k)
+  for(i in seq_along(terms)){
+    assert_character(terms[i], any.missing = FALSE)
+  }
+  assert_character(model, len = 1, any.missing = FALSE)
+  assert_list(params, types = "character", any.missing = FALSE)
+  assert_character(token, len = 1)
+  assert_character(context, len = 1, any.missing = FALSE)
+  assert_character(sep_terms, len = 1, any.missing = FALSE)
+  assert_int(max_length_label)
+  assert_character(prompt_type, len = 1, any.missing = FALSE)
+  assert_int(max_wait)
+  assert_logical(progress, len = 1, any.missing = FALSE)
 
   model_output = character(k)
   prompts = sapply(terms, function(x)
