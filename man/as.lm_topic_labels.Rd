@@ -25,28 +25,36 @@ is.lm_topic_labels(obj, verbose = FALSE)
 individual results. Individually set elements overwrite elements from \code{x}.}
 
 \item{terms}{[\code{list(n) of character}]\cr
-TBA}
+List of \code{character} vectors, whereas each vector represents the top terms
+of a topic. Topics may consist of different numbers of top terms.}
 
 \item{prompts}{[\code{character(n)}]\cr
-TBA}
+Optional.\cr
+Each entry of the \code{character} vector contains the original prompt that
+was used to obtain the corresponding entry of \code{model_output}.}
 
 \item{model}{[\code{character(1)}]\cr
-TBA}
+The language model used for labeling the topics.}
 
 \item{params}{[\code{named list}]\cr
-TBA}
+Optional.\cr
+Model parameters passed.}
 
 \item{with_token}{[\code{logical(1)}]\cr
-TBA}
+Optional.\cr
+Was the labeling executed using a Huggingface token?}
 
 \item{time}{[\code{numeric(1)}]\cr
-TBA}
+Optional.\cr
+Time needed for the labeling.}
 
 \item{model_output}{[\code{character(n)}]\cr
-TBA}
+Optional.\cr
+Each entry of the \code{character} vector contains the original model output
+obtained using the corresponding prompt from \code{prompts}.}
 
 \item{labels}{[\code{character(n)}]\cr
-TBA}
+The extracted labels from \code{model_output}.}
 
 \item{obj}{[\code{R} object]\cr
 Object to test.}

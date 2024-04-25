@@ -12,21 +12,29 @@
 #' \code{\link{RollingLDA}} object. Alternatively each element can be passed for
 #' individual results. Individually set elements overwrite elements from \code{x}.
 #' @param terms [\code{list(n) of character}]\cr
-#' TBA
+#' List of \code{character} vectors, whereas each vector represents the top terms
+#' of a topic. Topics may consist of different numbers of top terms.
 #' @param prompts [\code{character(n)}]\cr
-#' TBA
+#' Optional.\cr
+#' Each entry of the \code{character} vector contains the original prompt that
+#' was used to obtain the corresponding entry of \code{model_output}.
 #' @param model [\code{character(1)}]\cr
-#' TBA
+#' The language model used for labeling the topics.
 #' @param params [\code{named list}]\cr
-#' TBA
+#' Optional.\cr
+#' Model parameters passed.
 #' @param with_token [\code{logical(1)}]\cr
-#' TBA
+#' Optional.\cr
+#' Was the labeling executed using a Huggingface token?
 #' @param time [\code{numeric(1)}]\cr
-#' TBA
+#' Optional.\cr
+#' Time needed for the labeling.
 #' @param model_output [\code{character(n)}]\cr
-#' TBA
+#' Optional.\cr
+#' Each entry of the \code{character} vector contains the original model output
+#' obtained using the corresponding prompt from \code{prompts}.
 #' @param labels [\code{character(n)}]\cr
-#' TBA
+#' The extracted labels from \code{model_output}.
 #' @param obj [\code{R} object]\cr
 #' Object to test.
 #' @param verbose [\code{logical(1)}]\cr
