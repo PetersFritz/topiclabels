@@ -119,196 +119,38 @@ is.lm_topic_labels = function(obj, verbose = FALSE){
     if (verbose) message(check_set_equal(names(obj), testNames))
     return(FALSE)
   }
-
-  # hier noch die Einzeltests analog hinzufügen
-
-  if (FALSE){
-    #id
-    if (verbose) message("id: ", appendLF = FALSE)
-    id = getID(obj)
-    if (!is.character(id) || !(length(id) == 1)){
-      if (verbose) message("not a character of length 1")
-      return(FALSE)
-    }
-    if (verbose) message("checked")
-
-    #lda
-    if (verbose) message("lda: ", appendLF = FALSE)
-    lda = try(getLDA(obj), silent = !verbose)
-    if(inherits(lda, "try-error")){
-      # should not happen
-      return(FALSE)
-    }
-    if(!is.LDA(lda)){
-      if (verbose) message("not an \"LDA\" object")
-      return(FALSE)
-    }
-    if (verbose) message("checked")
-
-    #docs
-    if (verbose) message("docs: ", appendLF = FALSE)
-    docs = getDocs(obj)
-    if (!test_list(docs, min.len = 1, names = "unique", types = "matrix", any.missing = FALSE)){
-      if (verbose) message(check_list(docs, min.len = 1, names = "unique", types = "matrix", any.missing = FALSE))
-      return(FALSE)
-    }
-    if (!all(sapply(docs, nrow) == 2)){
-      if (verbose) message("not all elements have two rows")
-      return(FALSE)
-    }
-    if (!all(sapply(docs, function(x) all(x[2,] == 1)))){
-      if (verbose) message("not all values in the second row equal 1")
-      return(FALSE)
-    }
-    if (verbose) message("checked")
-
-    #dates
-    if (verbose) message("dates: ", appendLF = FALSE)
-    dates = getDates(obj)
-    if (!test_date(dates, any.missing = FALSE)){
-      if (verbose) message(check_date(dates, any.missing = FALSE))
-      return(FALSE)
-    }
-    if (!all(names(dates) %in% names(docs)) || !all(names(docs) %in% names(dates))){
-      if (verbose) message("not same names as \"docs\"")
-      return(FALSE)
-    }
-    if (length(dates) != length(docs)){
-      # should not happen
-      if (verbose) message("not same length as \"docs\"")
-      return(FALSE)
-    }
-    if (verbose) message("checked")
-
-    #vocab
-    if (verbose) message("vocab: ", appendLF = FALSE)
-    vocab = getVocab(obj)
-    if (!test_character(vocab, any.missing = FALSE, unique = TRUE)){
-      if (verbose) message(check_character(vocab, any.missing = FALSE, unique = TRUE))
-      return(FALSE)
-    }
-    if (verbose) message("checked")
-
-    #chunks
-    if (verbose) message("chunks: ", appendLF = FALSE)
-    chunks = getChunks(obj)
-    if (!is.data.table(chunks) ||
-        !all(c("chunk.id", "start.date", "end.date", "memory", "n", "n.discarded",
-               "n.memory", "n.vocab") %in% colnames(chunks))){
-      if (verbose) message("not a data.table with standard parameters")
-      return(FALSE)
-    }
-    if (anyDuplicated(chunks$chunk.id)){
-      if (verbose) message("duplicated \"chunk.id\"")
-      return(FALSE)
-    }
-    if (!is.integer(chunks$chunk.id)){
-      if (verbose) message("\"chunk.id\" is not an integer")
-      return(FALSE)
-    }
-    if (!is.integer(chunks$n)){
-      if (verbose) message("\"n\" is not an integer")
-      return(FALSE)
-    }
-    if (!is.integer(chunks$n.discarded)){
-      if (verbose) message("\"n.discarded\" is not an integer")
-      return(FALSE)
-    }
-    if (!is.integer(chunks$n.memory)){
-      if (verbose) message("\"n.memory\" is not an integer")
-      return(FALSE)
-    }
-    if (!is.integer(chunks$n.vocab)){
-      if (verbose) message("\"n.vocab\" is not an integer")
-      return(FALSE)
-    }
-    if (!is.Date(chunks$start.date)){
-      if (verbose) message("\"start.date\" is not a Date object")
-      return(FALSE)
-    }
-    if (!is.Date(chunks$end.date)){
-      if (verbose) message("\"end.date\" is not a Date object")
-      return(FALSE)
-    }
-    if (!is.Date(chunks$memory)){
-      if (verbose) message("\"memory\" is not a Date object")
-      return(FALSE)
-    }
-    if (any(is.na(chunks$chunk.id))){
-      if (verbose) message("NA(s) in \"chunk.id\"")
-      return(FALSE)
-    }
-    if (any(is.na(chunks$n))){
-      if (verbose) message("NA(s) in \"n\"")
-      return(FALSE)
-    }
-    if (any(is.na(chunks$n.vocab))){
-      if (verbose) message("NA(s) in \"n.vocab\"")
-      return(FALSE)
-    }
-    if (any(is.na(chunks$start.date))){
-      if (verbose) message("NA(s) in \"start.date\"")
-      return(FALSE)
-    }
-    if (any(is.na(chunks$end.date))){
-      if (verbose) message("NA(s) in \"end.date\"")
-      return(FALSE)
-    }
-    if (length(dates) != sum(chunks$n)){
-      if (verbose) message("sum of \"n\" does not match number of texts")
-      return(FALSE)
-    }
-    if (length(vocab) != max(chunks$n.vocab)){
-      if (verbose) message("max of \"n.vocab\" does not match number of vocabularies")
-      return(FALSE)
-    }
-    if (is.unsorted(chunks$n.vocab)){
-      if (verbose) message("\"n.vocab\" is not monotonously increasing")
-      return(FALSE)
-    }
-    if (min(dates) < min(chunks$start.date)){
-      if (verbose) message("minimum of \"start.date\" is larger than minimum of text's dates")
-      return(FALSE)
-    }
-    if (max(dates) > max(chunks$end.date)){
-      if (verbose) message("maximum of \"end.date\" is smaller than maximum of text's dates")
-      return(FALSE)
-    }
-    if (verbose) message("checked")
-
-    #param
-    if (verbose) message("param: ", appendLF = FALSE)
-    param = getParam(obj)
-    testNames = c("vocab.abs", "vocab.rel", "vocab.fallback", "doc.abs")
-    if (!test_list(param, types = c("numeric", "integer"), names = "named", any.missing = FALSE)){
-      if (verbose) message(check_list(param, types = c("numeric", "integer"), names = "named", any.missing = FALSE))
-      return(FALSE)
-    }
-    if (!test_set_equal(names(param), testNames)){
-      if (verbose) message(check_set_equal(names(param), testNames))
-      return(FALSE)
-    }
-    if (param$vocab.abs < 0){
-      if (verbose) message("\"vocab.abs\" is smaller than 0")
-      return(FALSE)
-    }
-    if (param$vocab.rel < 0){
-      if (verbose) message("\"vocab.rel\" is smaller than 0")
-      return(FALSE)
-    }
-    if (param$vocab.rel > 1){
-      if (verbose) message("\"vocab.rel\" is greater than 0")
-      return(FALSE)
-    }
-    if (param$vocab.fallback < 0){
-      if (verbose) message("\"vocab.fallback\" is smaller than 0")
-      return(FALSE)
-    }
-    if (param$doc.abs < 0){
-      if (verbose) message("\"doc.abs\" is smaller than 0")
-      return(FALSE)
-    }
-    if (verbose) message("checked")
+  if (!test_list(obj$terms, any.missing = FALSE, types = "character")){
+    if (verbose) check_list(obj$terms, any.missing = FALSE, types = "character")
+    return(FALSE)
+  }
+  n = length(obj$terms)
+  if (!test_character(obj$prompts, len = n)){
+    if (verbose) check_character(obj$prompts, len = n)
+    return(FALSE)
+  }
+  if (!test_character(obj$model, any.missing = FALSE, len = 1)){
+    if (verbose) check_character(obj$model, any.missing = FALSE, len = 1)
+    return(FALSE)
+  }
+  if (!test_list(obj$params, names = "unique")){
+    if (verbose) check_list(obj$params, names = "unique")
+    return(FALSE)
+  }
+  if (!test_logical(obj$with_token, len = 1)){
+    if (verbose) check_logical(obj$with_token, len = 1)
+    return(FALSE)
+  }
+  if (!test_numeric(obj$time, len = 1, lower = 0)){
+    if (verbose) check_numeric(obj$time, len = 1, lower = 0)
+    return(FALSE)
+  }
+  if (!test_character(obj$model_output, len = n)){
+    if (verbose) check_character(obj$model_output, len = n)
+    return(FALSE)
+  }
+  if (!test_character(obj$labels, len = n)){
+    if (verbose) check_character(obj$labels, len = n)
+    return(FALSE)
   }
   return(TRUE)
 }
