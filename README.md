@@ -31,7 +31,9 @@ devtools::install_github("PetersFritz/topiclabels")
 ```
 
 ## (Quick Start) Example
-
+``` r
+library(topiclabels)
+```
 First of all, you should store your Huggingface token in the variable ``token``. If you do not have a token, create a Huggingface account and generate a token based on this [guideline](https://huggingface.co/docs/transformers.js/guides/private).
 ``` r
 token = "" # set your hf token here
