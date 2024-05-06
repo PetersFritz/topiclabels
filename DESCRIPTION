@@ -1,8 +1,8 @@
-Package: PACKAGENAME
+Package: topiclabels
 Type: Package
-Title: PACKAGE TITLE
+Title: Automated Topic Labeling with Language Models
 Version: 0.0.1
-Date: 2023-09-17
+Date: 2024-05-06
 Authors@R: c(person(given = "VORNAME",
            family = "NACHNAME",
            role = c("aut", "cre"),
@@ -19,7 +19,7 @@ Authors@R: c(person(given = "VORNAME",
            email = "rieger@statistik.tu-dortmund.de",
            comment = c(ORCID = "0000-0002-0007-4478")))
 Maintainer: VORNAME NAME <MAIL>
-Description: SOME TEXT
+Description: Leveraging (large) language models for automatic topic labeling. The main function converts a list of top terms into a label for each topic. Hence, it is complementary to any topic modeling package that produces a list of top terms for each topic. While human judgement is indispensable for topic validation (i.e., inspecting top terms and most representative documents), automatic topic labeling can be a valuable tool for researchers in various scenarios.
 License: GPL (>= 3)
 Encoding: UTF-8
 Depends:
@@ -32,8 +32,8 @@ Imports:
 	jsonlite
 LazyData: true
 RoxygenNote: 7.2.3
-URL: GITHUB URL
-BugReports: GITHUB ISSE URL
+URL: https://github.com/PetersFritz/topiclabels
+BugReports: https://github.com/PetersFritz/topiclabels/issues
 Suggests: 
     knitr,
     rmarkdown,

@@ -1,13 +1,14 @@
-#' @title topiclabels
+#' @title Automated Topic Labeling with Language Models
 #'
-#' @description DESCRIPTION
+#' @description Leveraging (large) language models for automatic topic labeling.
+#' The main function converts a list of top terms into a label for each topic.
+#' Hence, it is complementary to any topic modeling package that produces a list
+#' of top terms for each topic. While human judgement is indispensable for
+#' topic validation (i.e., inspecting top terms and most representative documents),
+#' automatic topic labeling can be a valuable tool for researchers in various scenarios.
 #'
-#' @section TITLE1
-#'
-#' @section TITLE2
-#'
-#' @references REFERENCES
-#'
+#' @section Labeling function:
+#' \code{\link{label_topics}}
 #'
 #' @import stats
 #' @import checkmate

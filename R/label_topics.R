@@ -102,7 +102,6 @@ label_topics = function(
   }
   k = length(terms)
 
-  # checkmate tests
   assert_list(terms, types = "character", any.missing = FALSE, len = k)
   for(i in seq_along(terms)){
     assert_character(terms[[i]], any.missing = FALSE)
