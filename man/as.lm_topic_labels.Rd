@@ -21,7 +21,7 @@ is.lm_topic_labels(obj, verbose = FALSE)
 }
 \arguments{
 \item{x}{[\code{named list}]\cr
-\code{\link{RollingLDA}} object. Alternatively each element can be passed for
+\code{\link[topiclabels:as.lm_topic_labels]{lm_topic_labels}} object. Alternatively each element can be passed for
 individual results. Individually set elements overwrite elements from \code{x}.}
 
 \item{terms}{[\code{list(n) of character}]\cr
@@ -63,14 +63,14 @@ Object to test.}
 Should test information be given in the console?}
 }
 \value{
-[\code{named list}] \code{\link{lm_topic_labels}} object.
+[\code{named list}] \code{\link[topiclabels:as.lm_topic_labels]{lm_topic_labels}} object.
 }
 \description{
 Constructor for lm_topic_labels objects used in this package.
 }
 \details{
 If you call \code{as.lm_topic_labels} on an object \code{x} which already is of
-the structure of an \code{lm_topic_labels} object (in particular a \code{lm_topic_labels}
+the structure of a \code{lm_topic_labels} object (in particular a \code{lm_topic_labels}
 object itself), the additional arguments \code{id, param, ...}
 may be used to override the specific elements.
 }
