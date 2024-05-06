@@ -32,3 +32,5 @@ devtools::install_github("PetersFritz/topiclabels")
 ## (Quick Start) Example
 
 TODO + Link to HTML Vignette
+
+[Vignette](https://htmlpreview.github.io/?https://github.com/PetersFritz/topiclabels/blob/main/performance/Compare_LLM_and_human_labels.html)
