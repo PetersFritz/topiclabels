@@ -91,7 +91,7 @@ obj$labels
 # [2] "Renewable Energy"
 ```
 
-Feel free to check the following other examples and check our [Vignette](https://htmlpreview.github.io/?https://github.com/PetersFritz/topiclabels/blob/main/performance/Compare_LLM_and_human_labels.html) of the package for further reading.
+Feel free to also check the following examples and check our [Vignette](https://htmlpreview.github.io/?https://github.com/PetersFritz/topiclabels/blob/main/performance/Compare_LLM_and_human_labels.html) of the package for further reading.
 ``` r
 label_topics(list(c("zidane", "figo", "ronaldo"), c("gas", "power", "wind")), token = token)
 label_topics(list("wind", "greta", "hambach"), token = token)
