@@ -13,6 +13,7 @@ topiclabels leverages (large) language models for automatic topic labeling. The 
 *Topic models (selection)*:
 * [BERTopic](https://github.com/MaartenGr/BERTopic)
 * [Structural Topic Model](https://www.structuraltopicmodel.com/)
+* [topicmodels](https://cran.r-project.org/package=topicmodels)
 * [RollingLDA](https://github.com/JonasRieger/rollinglda)
 * [ldaPrototype](https://github.com/JonasRieger/ldaPrototype)
 
@@ -31,4 +32,6 @@ devtools::install_github("PetersFritz/topiclabels")
 
 ## (Quick Start) Example
 
-TODO + Link to HTML Vignette
+TODO
+
+[Vignette](https://htmlpreview.github.io/?https://github.com/PetersFritz/topiclabels/blob/main/performance/Compare_LLM_and_human_labels.html) (only works for public repos)
