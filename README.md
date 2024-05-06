@@ -71,6 +71,26 @@ lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
  1: Real Madrid Midfielders [zidane, figo, kroos]
  2: Renewable Energy [gas, power, wind]
 ```
+Beyond this, it is also possible to display the actual generated outputs of the language models, which might be helpful if our default postprocessing function did not generate proper labels for single topics.
+``` r
+obj = label_topics(topwords_matrix, token = token)
+names(obj)
+# [1] "terms"       
+# [2] "prompts"     
+# [3] "model"       
+# [4] "params"      
+# [5] "with_token"  
+# [6] "time"        
+# [7] "model_output"
+# [8] "labels"      
+obj$model_output
+# [1] "\n\n{\n\"label\": \"Real Madrid Midfielders\"\n}"
+# [2] "\n\n{\n\"label\": \"Renewable Energy\"\n}"
+obj$labels
+# [1] "Real Madrid Midfielders"
+# [2] "Renewable Energy"
+```
+
 Feel free to check the following other examples and check our [Vignette](https://htmlpreview.github.io/?https://github.com/PetersFritz/topiclabels/blob/main/performance/Compare_LLM_and_human_labels.html) of the package for further reading.
 ``` r
 label_topics(list(c("zidane", "figo", "ronaldo"), c("gas", "power", "wind")), token = token)
