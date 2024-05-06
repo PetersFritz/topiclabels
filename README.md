@@ -33,4 +33,4 @@ devtools::install_github("PetersFritz/topiclabels")
 
 TODO + Link to HTML Vignette
 
-<a href="https://github.com/PetersFritz/topiclabels/blob/main/performance/Compare_LLM_and_human_labels.html" download>Download Vignette</a>
+[Vignette](https://htmlpreview.github.io/?https://github.com/PetersFritz/topiclabels/blob/main/performance/Compare_LLM_and_human_labels.html) (only works for public repos)
