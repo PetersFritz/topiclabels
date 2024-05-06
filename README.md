@@ -25,3 +25,6 @@ For installation of the development version use [devtools](https://cran.r-projec
 devtools::install_github("PetersFritz/topiclabels")
 ```
 
+## (Quick Start) Example
+
+TODO + Link to HTML Vignette
