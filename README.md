@@ -13,6 +13,7 @@ topiclabels leverages (large) language models for automatic topic labeling. The 
 *Topic models (selection)*:
 * [BERTopic](https://github.com/MaartenGr/BERTopic)
 * [Structural Topic Model](https://www.structuraltopicmodel.com/)
+* [topicmodels](https://cran.r-project.org/package=topicmodels)
 * [RollingLDA](https://github.com/JonasRieger/rollinglda)
 * [ldaPrototype](https://github.com/JonasRieger/ldaPrototype)
 
