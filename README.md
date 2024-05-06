@@ -32,6 +32,48 @@ devtools::install_github("PetersFritz/topiclabels")
 
 ## (Quick Start) Example
 
-TODO
+First of all, you should store your Huggingface token in the variable ``token``. If you do not have a token, create a Huggingface account and generate a token based on this [guideline](https://huggingface.co/docs/transformers.js/guides/private).
+``` r
+token = "" # set your hf token here
+```
+We would now like to label two topics, one with the three top terms *zidane, figo, kroos* and the other with the three top terms *gas, power, wind*.
+``` r
+topwords_matrix = matrix(c("zidane", "figo", "kroos", "gas", "power", "wind"), ncol = 2)
+topwords_list = list(c("zidane", "figo", "kroos"), c("gas", "power", "wind"))
+```
+A common way to represent top terms is a matrix structure.
+```
+topwords_matrix
+     [,1]     [,2]   
+[1,] "zidane" "gas"  
+[2,] "figo"   "power"
+[3,] "kroos"  "wind" 
+```
+For our package, it is not necessary that all topics are characterized by the same number of top terms. For this case, the input must be given via the following list format:
+```
+topwords_list
+[[1]]
+[1] "zidane" "figo"   "kroos" 
 
-[Vignette](https://htmlpreview.github.io/?https://github.com/PetersFritz/topiclabels/blob/main/performance/Compare_LLM_and_human_labels.html) (only works for public repos)
+[[2]]
+[1] "gas"   "power" "wind" 
+```
+Using one of the following two calls
+``` r
+label_topics(topwords_matrix, token = token)
+label_topics(topwords_list, token = token)
+```
+the labels for the two topics can then be generated, which yields
+```
+lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
+ 1: Real Madrid Midfielders [zidane, figo, kroos]
+ 2: Renewable Energy [gas, power, wind]
+```
+Feel free to check the following other examples and check our [Vignette](https://htmlpreview.github.io/?https://github.com/PetersFritz/topiclabels/blob/main/performance/Compare_LLM_and_human_labels.html) of the package for further reading.
+``` r
+label_topics(list(c("zidane", "figo", "ronaldo"), c("gas", "power", "wind")), token = token)
+label_topics(list("wind", "greta", "hambach"), token = token)
+label_topics(list("wind", "fire", "air"), token = token)
+label_topics(list("wind", "feuer", "luft"), token = token)
+label_topics(list("wind", "feuer", "luft"), context = "Elements of the Earth", token = token)
+```
