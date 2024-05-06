@@ -10,6 +10,10 @@
 #' @section Labeling function:
 #' \code{\link{label_topics}}
 #'
+#' @section Constructor:
+#' \code{\link{as.lm_topic_labels}}
+#'
+#'
 #' @import stats
 #' @import checkmate
 #' @import progress

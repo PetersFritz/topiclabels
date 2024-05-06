@@ -3,7 +3,7 @@
 \name{as.lm_topic_labels}
 \alias{as.lm_topic_labels}
 \alias{is.lm_topic_labels}
-\title{lm_topic_labels Object}
+\title{lm_topic_labels object}
 \usage{
 as.lm_topic_labels(
   x,
@@ -75,6 +75,21 @@ object itself), the additional arguments \code{id, param, ...}
 may be used to override the specific elements.
 }
 \examples{
-# EXAMPLES TBA
+\dontrun{
+token = "" # please insert your hf token here
+topwords_matrix = matrix(c("zidane", "figo", "kroos",
+                           "gas", "power", "wind"), ncol = 2)
+obj = label_topics(topwords_matrix, token = token)
+obj$model
+obj_modified = as.lm_topic_labels(obj, model = "It is possible to modify individual entries")
+obj_modified$model
 
+obj_modified$model = 3.5 # example for an invalid modification
+is.lm_topic_labels(obj_modified, verbose = TRUE)
+
+obj_manual = as.lm_topic_labels(terms = list(c("zidane", "figo", "kroos"),
+                                             c("gas", "power", "wind")),
+                                model = "manual labels",
+                                labels = c("Football Players", "Energy Supply"))
+}
 }

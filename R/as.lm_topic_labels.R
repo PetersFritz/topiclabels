@@ -1,4 +1,4 @@
-#' @title lm_topic_labels Object
+#' @title lm_topic_labels object
 #'
 #' @description Constructor for lm_topic_labels objects used in this package.
 #'
@@ -42,8 +42,23 @@
 #' @return [\code{named list}] \code{\link{lm_topic_labels}} object.
 #'
 #' @examples
-#' # EXAMPLES TBA
+#' \dontrun{
+#' token = "" # please insert your hf token here
+#' topwords_matrix = matrix(c("zidane", "figo", "kroos",
+#'                            "gas", "power", "wind"), ncol = 2)
+#' obj = label_topics(topwords_matrix, token = token)
+#' obj$model
+#' obj_modified = as.lm_topic_labels(obj, model = "It is possible to modify individual entries")
+#' obj_modified$model
 #'
+#' obj_modified$model = 3.5 # example for an invalid modification
+#' is.lm_topic_labels(obj_modified, verbose = TRUE)
+#'
+#' obj_manual = as.lm_topic_labels(terms = list(c("zidane", "figo", "kroos"),
+#'                                              c("gas", "power", "wind")),
+#'                                 model = "manual labels",
+#'                                 labels = c("Football Players", "Energy Supply"))
+#' }
 #' @export as.lm_topic_labels
 as.lm_topic_labels = function(x, terms, prompts, model, params, with_token, time,
                               model_output, labels){
@@ -116,46 +131,46 @@ is.lm_topic_labels = function(obj, verbose = FALSE){
     return(FALSE)
   }
   if (!test_set_equal(names(obj), testNames)){
-    if (verbose) message(check_set_equal(names(obj), testNames))
+    if (verbose) message("Names of object: ", check_set_equal(names(obj), testNames))
     return(FALSE)
   }
   if (!test_list(obj$terms, any.missing = FALSE, types = "character")){
-    if (verbose) check_list(obj$terms, any.missing = FALSE, types = "character")
+    if (verbose) message("terms: ", check_list(obj$terms, any.missing = FALSE, types = "character"))
     return(FALSE)
   }
   n = length(obj$terms)
   for(i in seq_along(obj$terms)){
     if (!test_character(obj$terms[[i]], any.missing = FALSE)){
-      if (verbose) check_character(obj$terms[i], any.missing = FALSE)
+      if (verbose) message("terms[[",i, "]]: ", check_character(obj$terms[[i]], any.missing = FALSE))
       return(FALSE)
     }
   }
   if (!test_character(obj$prompts, len = n)){
-    if (verbose) check_character(obj$prompts, len = n)
+    if (verbose) message("prompts: ", check_character(obj$prompts, len = n))
     return(FALSE)
   }
   if (!test_character(obj$model, any.missing = FALSE, len = 1)){
-    if (verbose) check_character(obj$model, any.missing = FALSE, len = 1)
+    if (verbose) message("model: ", check_character(obj$model, any.missing = FALSE, len = 1))
     return(FALSE)
   }
   if (!test_list(obj$params, names = "unique")){
-    if (verbose) check_list(obj$params, names = "unique")
+    if (verbose) message("params: ", check_list(obj$params, names = "unique"))
     return(FALSE)
   }
   if (!test_logical(obj$with_token, len = 1)){
-    if (verbose) check_logical(obj$with_token, len = 1)
+    if (verbose) message("with_token: ", check_logical(obj$with_token, len = 1))
     return(FALSE)
   }
   if (!test_numeric(obj$time, len = 1, lower = 0)){
-    if (verbose) check_numeric(obj$time, len = 1, lower = 0)
+    if (verbose) message("time: ", check_numeric(obj$time, len = 1, lower = 0))
     return(FALSE)
   }
   if (!test_character(obj$model_output, len = n)){
-    if (verbose) check_character(obj$model_output, len = n)
+    if (verbose) message("model_output: ", check_character(obj$model_output, len = n))
     return(FALSE)
   }
   if (!test_character(obj$labels, len = n)){
-    if (verbose) check_character(obj$labels, len = n)
+    if (verbose) message("labels: ", check_character(obj$labels, len = n))
     return(FALSE)
   }
   return(TRUE)
@@ -172,7 +187,7 @@ print.lm_topic_labels = function(x, nchars = 45, ...){
     topic_terms = paste0(" [", topic_terms, "]")
   }
   cat(
-    "lm_topic_labels Object generated using ", x$model, "\n ",
+    "lm_topic_labels object generated using ", x$model, "\n ",
     paste0(seq_along(x$labels), ": ", x$labels, topic_terms, collapse = "\n "),
     sep = ""
   )

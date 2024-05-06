@@ -77,8 +77,28 @@
 #' @return [\code{named list}] \code{\link{lm_topic_labels}} object.
 #'
 #' @examples
-#' # EXAMPLES TBA
+#' \dontrun{
+#' token = "" # please insert your hf token here
+#' topwords_matrix = matrix(c("zidane", "figo", "kroos",
+#'                            "gas", "power", "wind"), ncol = 2)
+#' label_topics(topwords_matrix, token = token)
+#' label_topics(list(c("zidane", "figo", "kroos"),
+#'                   c("gas", "power", "wind")),
+#'              token = token)
+#' label_topics(list(c("zidane", "figo", "ronaldo"),
+#'                   c("gas", "power", "wind")),
+#'              token = token)
 #'
+#' label_topics(list("wind", "greta", "hambach"),
+#'              token = token)
+#' label_topics(list("wind", "fire", "air"),
+#'              token = token)
+#' label_topics(list("wind", "feuer", "luft"),
+#'              token = token)
+#' label_topics(list("wind", "feuer", "luft"),
+#'              context = "Elements of the Earth",
+#'              token = token)
+#' }
 #' @export label_topics
 
 label_topics = function(
