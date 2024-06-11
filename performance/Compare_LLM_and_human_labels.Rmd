@@ -870,28 +870,28 @@ labels_ldaproto
 
 # References
 
-Bittermann, A., McNamara, D., Simonsmeier, B.A. et al. The Landscape of Research on Prior Knowledge and Learning: a Bibliometric Analysis. Educ Psychol Rev 35, 58 (2023). <https://doi.org/10.1007/s10648-023-09775-9> 
+Bittermann, A., McNamara, D., Simonsmeier, B.A. et al. The Landscape of Research on Prior Knowledge and Learning: a Bibliometric Analysis. Educ Psychol Rev 35, 58 (2023). <https://doi.org/10.1007/s10648-023-09775-9> 
 
-Weber, M. (2021). How Do 50-Year-Olds Imagine Their Future: Social Class and Gender Disparities. Sage Open, 11(4). <https://doi.org/10.1177/21582440211061567>
+Dwivedi, Y. K., Sharma, A., Rana, N. P., Giannakis, M., Goel, P., & Dutot, V. (2023). Evolution of artificial intelligence research in Technological Forecasting and Social Change: Research topics, trends, and future directions. Technological Forecasting and Social Change, 192, 122579. <https://doi.org/10.1016/j.techfore.2023.122579>
 
-Kwon, J., & Nguyen, M. T. (2023). Four Decades of Research on Racial Equity and Justice in Urban Planning. Journal of Planning Education and Research, 0(0). <https://doi.org/10.1177/0739456X231156827>
+Grün, B., & Hornik, K. (2024). topicmodels: Topic models [R package version 0.2-16]. Retrieved from <https://CRAN.R-project.org/package=topicmodels>
 
-Sharma, A., Rana, N. P., & Nunkoo, R. (2021). Fifty years of information management research: A conceptual structure analysis using structural topic modeling. International Journal of Information Management, 58, 102316. <https://doi.org/10.1016/j.ijinfomgt.2021.102316>
+Heiberger, R. H., Munoz-Najar Galvez, S., & McFarland, D. A. (2021). Facets of Specialization and Its Relation to Career Success: An Analysis of U.S. Sociology, 1980 to 2015. American Sociological Review, 86(6), 1164-1192. <https://doi.org/10.1177/00031224211056267>
 
-Phillips, J. A., Davidson, T. R., & Baffoe-Bonnie, M. S. (2023). Identifying latent themes in suicide among black and white adolescents and young adults using the National Violent Death Reporting System, 2013–2019. Social Science & Medicine, 334, 116144. <https://doi.org/10.1016/j.socscimed.2023.116144>
+Kwon, J., & Nguyen, M. T. (2023). Four Decades of Research on Racial Equity and Justice in Urban Planning. Journal of Planning Education and Research, 0(0). <https://doi.org/10.1177/0739456X231156827>
 
-Tonidandel, S., Summerville, K. M., Gentry, W. A., & Young, S. F. (2022). Using structural topic modeling to gain insight into challenges faced by leaders. The Leadership Quarterly, 33(5), 101576. <https://doi.org/10.1016/j.leaqua.2021.101576>
+Li, D., Zhang, B., & Zhou, Y. (2023, July 21). Can Large Language Models  (LLM) label topics from a topic model?. <https://doi.org/10.31235/osf.io/23x4m>
 
-Dwivedi, Y. K., Sharma, A., Rana, N. P., Giannakis, M., Goel, P., & Dutot, V. (2023). Evolution of artificial intelligence research in Technological Forecasting and Social Change: Research topics, trends, and future directions. Technological Forecasting and Social Change, 192, 122579. <https://doi.org/10.1016/j.techfore.2023.122579>
+Phillips, J. A., Davidson, T. R., & Baffoe-Bonnie, M. S. (2023). Identifying latent themes in suicide among black and white adolescents and young adults using the National Violent Death Reporting System, 2013–2019. Social Science & Medicine, 334, 116144. <https://doi.org/10.1016/j.socscimed.2023.116144>
 
-Heiberger, R. H., Munoz-Najar Galvez, S., & McFarland, D. A. (2021). Facets of Specialization and Its Relation to Career Success: An Analysis of U.S. Sociology, 1980 to 2015. American Sociological Review, 86(6), 1164-1192. <https://doi.org/10.1177/00031224211056267>
+Rieger, J. (2020). ldaPrototype: A method in R to get a prototype of multiple latent Dirichlet allocations. Journal of Open Source Software, 5(51), 2181. <https://doi.org/10.21105/joss.02181>
 
-Wijffels, J. (2023). BTM: Biterm topic models for short text [R package version 0.3.7]. Retrieved from <https://CRAN.R-project.org/package=BTM>
+Roberts, M. E., Stewart, B. M., & Tingley, D. (2019). stm: An R package for structural topic models. Journal of Statistical Software, 91(2), 1-40. <https://doi.org/10.18637/jss.v091.i02>
 
-Grün, B., & Hornik, K. (2024). topicmodels: Topic models [R package version 0.2-16]. Retrieved from <https://CRAN.R-project.org/package=topicmodels>
+Sharma, A., Rana, N. P., & Nunkoo, R. (2021). Fifty years of information management research: A conceptual structure analysis using structural topic modeling. International Journal of Information Management, 58, 102316. <https://doi.org/10.1016/j.ijinfomgt.2021.102316>
 
-Roberts, M. E., Stewart, B. M., & Tingley, D. (2019). stm: An R package for structural topic models. Journal of Statistical Software, 91(2), 1-40. <https://doi.org/10.18637/jss.v091.i02>
+Tonidandel, S., Summerville, K. M., Gentry, W. A., & Young, S. F. (2022). Using structural topic modeling to gain insight into challenges faced by leaders. The Leadership Quarterly, 33(5), 101576. <https://doi.org/10.1016/j.leaqua.2021.101576>
 
-Rieger, J. (2020). ldaPrototype: A method in R to get a prototype of multiple latent Dirichlet allocations. Journal of Open Source Software, 5(51), 2181. <https://doi.org/10.21105/joss.02181>
+Weber, M. (2021). How Do 50-Year-Olds Imagine Their Future: Social Class and Gender Disparities. Sage Open, 11(4). <https://doi.org/10.1177/21582440211061567>
 
-Li, D., Zhang, B., & Zhou, Y. (2023, July 21). Can Large Language Models  (LLM) label topics from a topic model?. <https://doi.org/10.31235/osf.io/23x4m>
+Wijffels, J. (2023). BTM: Biterm topic models for short text [R package version 0.3.7]. Retrieved from <https://CRAN.R-project.org/package=BTM>
