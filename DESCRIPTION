@@ -2,23 +2,33 @@ Package: topiclabels
 Type: Package
 Title: Automated Topic Labeling with Language Models
 Version: 0.0.1
-Date: 2024-05-06
-Authors@R: c(person(given = "VORNAME",
-           family = "NACHNAME",
-           role = c("aut", "cre"),
-           email = "mail",
-	   comment = c(ORCID = "orcid")),
-    person(given = "VORNAME",
-           family = "NACHNAME",
-           role = "aut",
-           email = "mail",
-	   comment = c(ORCID = "orcid")),
-    person(given = "Jonas",
+Date: 2024-06-11
+Authors@R: c(person(given = "Jonas",
            family = "Rieger",
            role = "aut",
            email = "rieger@statistik.tu-dortmund.de",
-           comment = c(ORCID = "0000-0002-0007-4478")))
-Maintainer: VORNAME NAME <MAIL>
+           comment = c(ORCID = "0000-0002-0007-4478")),
+    person(given = "Fritz",
+           family = "Peters",
+           role = "aut",
+           email = "fpeters3@sheffield.ac.uk",
+	   comment = c(ORCID = "0009-0003-8471-4931")),
+    person(given = "Andreas",
+           family = "Fischer",
+           role = "aut",
+           email = "andreasfischer1985@web.de",
+	   comment = c(ORCID = "0009-0006-0748-6076")),
+    person(given = "Tim",
+           family = "Lauer",
+           role = "aut",
+           email = "tl@leibniz-psychology.org",
+	   comment = c(ORCID = "0009-0003-1625-1672")),
+    person(given = "André",
+           family = "Bittermann",
+           role = "aut",
+           email = "abi@leibniz-psychology.org",
+	   comment = c(ORCID = "0000-0003-2942-9831")))
+Maintainer: Jonas Rieger <rieger@statistik.tu-dortmund.de>
 Description: Leveraging (large) language models for automatic topic labeling. The main function converts a list of top terms into a label for each topic. Hence, it is complementary to any topic modeling package that produces a list of top terms for each topic. While human judgement is indispensable for topic validation (i.e., inspecting top terms and most representative documents), automatic topic labeling can be a valuable tool for researchers in various scenarios.
 License: GPL (>= 3)
 Encoding: UTF-8
