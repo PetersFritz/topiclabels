@@ -1,6 +1,11 @@
 ---
-title: 'topiclabels: An R Package for Automated Topic Labeling Using Large Language
-  Models'
+title: 'topiclabels: An R Package for Automated Topic Labeling Using Large Language Models'
+author:
+  - Jonas Rieger, TU Dortmund University, rieger@statistik.tu-dortmund.de
+  - Fritz Peters, University of Sheffield, fpeters3@sheffield.ac.uk
+  - Andreas Fischer, Forschungsinstitut Betriebliche Bildung (f-bb), andreasfischer1985@web.de
+  - Tim Lauer, Leibniz Institute for Psychology (ZPID), tl@leibniz-psychology.org
+  - André Bittermann, Leibniz Institute for Psychology (ZPID), abi@leibniz-psychology.org
 output:
   html_document:
     df_print: paged
@@ -24,7 +29,7 @@ Currently, the HuggingFace API is used to access the LLM. The default model is [
 
 In the following, we compare the automatically generated topic labels with the labels of human coders published in various topic modeling studies.
 
-_Note:_ Generative AI (i.e., GitHub Copilot) was used for coding assistance.
+*Note:* Generative AI (i.e., GitHub Copilot) was used for coding assistance.
 
 # Setup
 
@@ -92,7 +97,7 @@ We provide all labels and top terms of the original studies in [Table_human_labe
 library(googlesheets4)
 gs4_deauth() # no authentication needed for public sheets
 human_labels <- read_sheet("1UcumvMI-j4ehNUVF-_DWc5cdkOsM8QbTGOPJ10wGZTw")
-human_labels
+as.data.frame(human_labels[1:5, c(1,3:4)])
 ```
 
 # Topic labeling with LLM
@@ -207,6 +212,7 @@ res <- data.frame(Study = human_labels$Study,
 ```{r}
 summary(res$Similarity)
 ```
+
 Overall, the mean cosine similarity between the human labels and the LLM labels is `r round(mean(res$Similarity), 2)`, indicating a moderate similarity between the two sets of labels. At least one human label was perfectly matched by the LLM (cosine similarity = 1), while the lowest similarity was `r round(min(res$Similarity), 2)`.
 
 Let's have a closer look at the performance for the different studies:
@@ -234,7 +240,7 @@ ggplot(res, aes(x = Study, y = Similarity, fill = Study)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
-    
+
 As we can see, there is variation in the similarity between human and LLM labels across the different studies. Some studies show higher similarity than others, indicating that the LLM's performance may vary depending on the topic - or the quality of the human labels.
 
 ### Comparison with ChatGPT-generated Labels in Li et al. (2023)
@@ -359,6 +365,7 @@ To identify non-informative human labels, a human rater assessed the informative
 # table of rating results
 table(human_labels$label_rating)
 ```
+
 We will consider labels with a rating of 0 and 1 as non-informative, in total `r sum(human_labels$label_rating == 0) + sum(human_labels$label_rating == 1)` labels.
 
 ```{r}
@@ -374,7 +381,7 @@ The mean similarity of these labels is `r round(mean(res[which(human_labels$labe
 res[which(human_labels$label_rating == 1),]
 
 ```
- 
+
 The mean similarity of these labels is `r round(mean(res[which(human_labels$label_rating == 1),]$Similarity), 3)`. We can see that the mean similarity of these labels is also lower than the mean similarity of all labels, which is `r round(mean(res$Similarity), 3)`.
 
 ### Similarity results without non-informative labels
@@ -393,6 +400,7 @@ res_low_removed <- res[-ind_low_informative,]
 ```{r}
 summary(res_low_removed$Similarity)
 ```
+
 As we can see, the removal of non-informative labels increases the mean similarity of human and LLM labels from `r round(mean(res$Similarity), 3)` to `r round(mean(res_low_removed$Similarity), 3)`.
 
 ### Comparing violin plots
@@ -422,7 +430,7 @@ ggplot(combined_data, aes(x = Study, y = Similarity, fill = Group)) +
   guides(fill = "none")
 
 ```
-  
+
 Studies with most non-informative labels were Li 2023 and Weber 2021 (see table above). This is reflected in their violin plots.
 
 ## Labeling with context information
@@ -602,11 +610,11 @@ Automated topic labels can be a valuable tool for researchers to quickly get an 
 
 Our proposed R package can be used with other topic modeling packages as well. The only requirement is that the topic modeling package provides a function to extract the top terms of each topic. The user can then provide these top terms to the `label_topics` function. The `label_topics` function will then generate the topic labels based on the provided top terms.
 
-In the following, we will illustrate this for different popular R packages (see Wiedemann, 2002, http://dx.doi.org/10.5771/1615-634X-2022-3-286)
+In the following, we will illustrate this for different popular R packages (see Wiedemann, 2002, <http://dx.doi.org/10.5771/1615-634X-2022-3-286>)
 
 ## topicmodels
 
-We use the example from the package vignette: https://cran.r-project.org/web/packages/topicmodels/vignettes/topicmodels.pdf
+We use the example from the package vignette (Grün & Hornik, 2024): <https://cran.r-project.org/web/packages/topicmodels/vignettes/topicmodels.pdf>
 
 ```{r eval=FALSE, echo=TRUE}
 # load data
@@ -639,6 +647,7 @@ jss_TM <- readRDS(paste0(path, "/jss_TM.RDS"))
 topics_topicmodels <- topicmodels::terms(jss_TM, 5)
 topics_topicmodels[,1:5]
 ```
+
 First, we transform the output to vectors of top terms.
 
 ```{r}
@@ -661,7 +670,7 @@ labels_topicmodels
 
 ## stm
 
-We use the example from the package vignette: https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf
+We use the example from the package vignette (Roberts et al., 2019): <https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf>
 
 ```{r eval=FALSE, echo=TRUE}
 data <- read.csv("https://raw.githubusercontent.com/dondealban/learning-stm/master/data/poliblogs2008.csv")
@@ -672,6 +681,7 @@ data <- read.csv("https://raw.githubusercontent.com/dondealban/learning-stm/mast
 library(stm)
 processed <- textProcessor(data$documents, metadata = data)
 ```
+
 ```{r eval=FALSE, echo=TRUE}
 # corpus preparation
 out <- prepDocuments(processed$documents, processed$vocab, processed$meta, lower.thresh = 15)
@@ -728,12 +738,14 @@ politics", token = hf_token)
 
 labels_stm
 ```
+
 Interestingly, two topics have not been labeled: Topics 12 and 13. Let's see if it works without context:
 
 ```{r}
 labels_stm_nocontext <- label_topics(as.list(topics_stm_vectors), token = hf_token)
 labels_stm_nocontext
 ```
+
 Now all topics are labeled. In the package [vignette](https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf) (page 19), Topic 3 is labeled as "Obama", Topic 7 as "Sarah Palin", and Topic 20 as "Bush Presidency". This matches our topic labels very well:
 
 ```{r}
@@ -742,7 +754,7 @@ labels_stm_nocontext$labels[c(3,7,20)]
 
 ## BTM
 
-We use the example from the package reference manual: https://cran.r-project.org/web/packages/BTM/BTM.pdf
+We use the example from the package reference manual (Wijffels, 2023): <https://cran.r-project.org/web/packages/BTM/BTM.pdf>
 
 ```{r eval=FALSE, echo=TRUE}
 # load data
@@ -807,7 +819,7 @@ As we can see, the LLM `mistralai/Mixtral-8x7B-Instruct-v0.1` can also handle Du
 
 ## ldaPrototype
 
-We use the example from the package GitHub repository: https://github.com/JonasRieger/ldaPrototype
+We use the example from the package GitHub repository (see also Rieger, 2020): <https://github.com/JonasRieger/ldaPrototype>
 
 ```{r eval=FALSE, echo=TRUE, message=FALSE}
 # load data
@@ -855,3 +867,31 @@ labels_ldaproto <- label_topics(as.list(topics_ldaproto_vectors), context = "Reu
 
 labels_ldaproto
 ```
+
+# References
+
+Bittermann, A., McNamara, D., Simonsmeier, B.A. et al. The Landscape of Research on Prior Knowledge and Learning: a Bibliometric Analysis. Educ Psychol Rev 35, 58 (2023). <https://doi.org/10.1007/s10648-023-09775-9> 
+
+Weber, M. (2021). How Do 50-Year-Olds Imagine Their Future: Social Class and Gender Disparities. Sage Open, 11(4). <https://doi.org/10.1177/21582440211061567>
+
+Kwon, J., & Nguyen, M. T. (2023). Four Decades of Research on Racial Equity and Justice in Urban Planning. Journal of Planning Education and Research, 0(0). <https://doi.org/10.1177/0739456X231156827>
+
+Sharma, A., Rana, N. P., & Nunkoo, R. (2021). Fifty years of information management research: A conceptual structure analysis using structural topic modeling. International Journal of Information Management, 58, 102316. <https://doi.org/10.1016/j.ijinfomgt.2021.102316>
+
+Phillips, J. A., Davidson, T. R., & Baffoe-Bonnie, M. S. (2023). Identifying latent themes in suicide among black and white adolescents and young adults using the National Violent Death Reporting System, 2013–2019. Social Science & Medicine, 334, 116144. <https://doi.org/10.1016/j.socscimed.2023.116144>
+
+Tonidandel, S., Summerville, K. M., Gentry, W. A., & Young, S. F. (2022). Using structural topic modeling to gain insight into challenges faced by leaders. The Leadership Quarterly, 33(5), 101576. <https://doi.org/10.1016/j.leaqua.2021.101576>
+
+Dwivedi, Y. K., Sharma, A., Rana, N. P., Giannakis, M., Goel, P., & Dutot, V. (2023). Evolution of artificial intelligence research in Technological Forecasting and Social Change: Research topics, trends, and future directions. Technological Forecasting and Social Change, 192, 122579. <https://doi.org/10.1016/j.techfore.2023.122579>
+
+Heiberger, R. H., Munoz-Najar Galvez, S., & McFarland, D. A. (2021). Facets of Specialization and Its Relation to Career Success: An Analysis of U.S. Sociology, 1980 to 2015. American Sociological Review, 86(6), 1164-1192. <https://doi.org/10.1177/00031224211056267>
+
+Wijffels, J. (2023). BTM: Biterm topic models for short text [R package version 0.3.7]. Retrieved from <https://CRAN.R-project.org/package=BTM>
+
+Grün, B., & Hornik, K. (2024). topicmodels: Topic models [R package version 0.2-16]. Retrieved from <https://CRAN.R-project.org/package=topicmodels>
+
+Roberts, M. E., Stewart, B. M., & Tingley, D. (2019). stm: An R package for structural topic models. Journal of Statistical Software, 91(2), 1-40. <https://doi.org/10.18637/jss.v091.i02>
+
+Rieger, J. (2020). ldaPrototype: A method in R to get a prototype of multiple latent Dirichlet allocations. Journal of Open Source Software, 5(51), 2181. <https://doi.org/10.21105/joss.02181>
+
+Li, D., Zhang, B., & Zhou, Y. (2023, July 21). Can Large Language Models  (LLM) label topics from a topic model?. <https://doi.org/10.31235/osf.io/23x4m>
