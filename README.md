@@ -1,4 +1,6 @@
 # topiclabels
+[![CRAN](https://www.r-pkg.org/badges/version/topiclabels)](https://cran.r-project.org/package=topiclabels)
+[![R build status](https://github.com/PetersFritz/topiclabels/workflows/R-CMD-check/badge.svg)](https://github.com/PetersFritz/topiclabels/actions)
 
 ## Automated Topic Labeling with Language Models
 
