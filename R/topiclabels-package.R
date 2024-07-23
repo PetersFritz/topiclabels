@@ -14,6 +14,7 @@
 #' \code{\link{as.lm_topic_labels}}
 #'
 #'
+#' @import utils
 #' @import stats
 #' @import checkmate
 #' @import progress
