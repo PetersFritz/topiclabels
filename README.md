@@ -25,6 +25,10 @@ For bug reports (lack of documentation, misleading or wrong documentation, unexp
 Pull requests are welcome and will be included at the discretion of the author.
 
 ## Installation
+You can install the recent CRAN version using 
+``` r
+install.packages("topiclabels")
+```
 
 For installation of the development version use [devtools](https://cran.r-project.org/package=devtools):
 
