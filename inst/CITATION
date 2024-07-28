@@ -7,11 +7,12 @@ bibentry(bibtype = "Manual",
   title        = "topiclabels: Automated Topic Labeling with Language Models",
   author       = "Jonas Rieger and Fritz Peters and Andreas Fischer and Tim Lauer and André Bittermann",
   year         = year,
+  doi          = "10.32614/CRAN.package.topiclabels",
   url          = "https://github.com/PetersFritz/topiclabels",
   note         = vers,
   textVersion  =
   paste("Rieger et al. (", year, "). ",
         "topiclabels: Automated Topic Labeling with Language Models. ",
-        vers, ". ",
+        vers, ", https://doi.org/10.32614/CRAN.package.topiclabels.",
         sep = "")
 )
