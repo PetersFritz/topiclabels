@@ -18,22 +18,11 @@ label_topics(...)
   max_length_label = 5L,
   prompt_type = c("json", "plain", "json-roles"),
   max_wait = 0L,
-  progress = TRUE
+  progress = TRUE,
+  ...
 )
 
-\method{label_topics}{labelTopics}(
-  terms,
-  model = "mistralai/Mixtral-8x7B-Instruct-v0.1",
-  params = list(),
-  token = NA_character_,
-  context = "",
-  sep_terms = "; ",
-  max_length_label = 5L,
-  prompt_type = c("json", "plain", "json-roles"),
-  stm_type = c("prob", "frex", "lift", "score"),
-  max_wait = 0L,
-  progress = TRUE
-)
+\method{label_topics}{labelTopics}(terms, stm_type = c("prob", "frex", "lift", "score"), ...)
 }
 \arguments{
 \item{...}{additional arguments}

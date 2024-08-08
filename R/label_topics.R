@@ -122,7 +122,7 @@ label_topics.default = function(
     max_length_label = 5L,
     prompt_type = c("json", "plain", "json-roles"),
     max_wait = 0L,
-    progress = TRUE){
+    progress = TRUE, ...){
 
   prompt_type = match.arg(prompt_type)
   params = c(params, .default_model_params(model))
@@ -217,16 +217,7 @@ label_topics.default = function(
 # stm support:
 label_topics.labelTopics = function(
     terms,
-    model = "mistralai/Mixtral-8x7B-Instruct-v0.1",
-    params = list(),
-    token = NA_character_,
-    context = "",
-    sep_terms = "; ",
-    max_length_label = 5L,
-    prompt_type = c("json", "plain", "json-roles"),
-    stm_type = c("prob", "frex", "lift", "score"),
-    max_wait = 0L,
-    progress = TRUE){
+    stm_type = c("prob", "frex", "lift", "score"), ...){
 
   stm_type = match.arg(stm_type)
   assert_character(stm_type, len = 1, any.missing = FALSE)
@@ -234,7 +225,5 @@ label_topics.labelTopics = function(
   terms = apply(terms[[stm_type]], 1, paste, collapse = ", ")
   terms = as.list(terms)
 
-  label_topics(terms = terms, model = model, params = params, token = token,
-               context = context, sep_terms = sep_terms, max_length_label = max_length_label,
-               prompt_type = prompt_type, max_wait = max_wait, progress = progress)
+  label_topics(terms = terms, ...)
 }
