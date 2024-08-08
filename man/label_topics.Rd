@@ -36,6 +36,8 @@ label_topics(...)
 )
 }
 \arguments{
+\item{...}{additional arguments}
+
 \item{terms}{[\code{list (k) of character}]\cr
 List (each list entry represents one topic) of \code{character} vectors
 containing the top terms representing the topics that are to be labeled.
