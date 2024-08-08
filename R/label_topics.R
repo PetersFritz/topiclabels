@@ -122,11 +122,11 @@ label_topics = function(
     if(is.matrix(terms)) terms = unname(as.list(as.data.frame(terms)))
     else terms = list(terms)
   }
-  if(class(terms) == "labelTopics"){
+  if(inherits(terms, "labelTopics")){
     terms <- apply(terms[[stm_type]], 1, paste, collapse = ", ")
     terms <- as.list(terms)
   }
-  if(is.list(terms) & class(terms[[1]]) == "data.frame"){
+  if(is.list(terms) & inherits(terms[[1]], "data.frame")){
     terms = lapply(terms, function(y){paste(y$token, collapse = ", ")})
   }
   k = length(terms)
