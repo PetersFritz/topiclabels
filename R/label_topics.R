@@ -74,7 +74,7 @@
 #' @param progress [\code{logical(1)}]\cr
 #' Should a nice progress bar be shown? Turning it off, could lead to
 #' significantly faster calculation. Default ist \code{TRUE}.
-#' @return [\code{named list}] \code{\link{lm_topic_labels}} object.
+#' @return [\code{named list}] \code{\link[topiclabels:as.lm_topic_labels]{lm_topic_labels}} object.
 #'
 #' @examples
 #' \dontrun{

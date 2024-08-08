@@ -1,18 +1,18 @@
-citHeader("To cite PACKAGE NAME in publications use:")
+citHeader("To cite topiclabels in publications use:")
 
 year = sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date)
 vers = paste("R package version", meta$Version)
 
 bibentry(bibtype = "Manual",
-  title        = "TITLE",
-  author       = "AUTHORS",
+  title        = "topiclabels: Automated Topic Labeling with Language Models",
+  author       = "Jonas Rieger and Fritz Peters and Andreas Fischer and Tim Lauer and André Bittermann",
   year         = year,
-  doi          = "ZENODO DOI",
-  url          = "GITHUB URL",
+  doi          = "10.32614/CRAN.package.topiclabels",
+  url          = "https://github.com/PetersFritz/topiclabels",
   note         = vers,
   textVersion  =
-  paste("AUTHORS (", year, "). ",
-        "TITLE ",
-        vers, ". ",
-        "DOI: ZENODO DOI.", sep = "")
+  paste("Rieger et al. (", year, "). ",
+        "topiclabels: Automated Topic Labeling with Language Models. ",
+        vers, ", https://doi.org/10.32614/CRAN.package.topiclabels.",
+        sep = "")
 )

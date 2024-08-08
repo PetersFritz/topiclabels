@@ -1,11 +1,11 @@
 Package: topiclabels
 Type: Package
 Title: Automated Topic Labeling with Language Models
-Version: 0.0.1
-Date: 2024-06-11
+Version: 0.1.0
+Date: 2024-07-23
 Authors@R: c(person(given = "Jonas",
            family = "Rieger",
-           role = "aut",
+           role = c("aut", "cre"),
            email = "rieger@statistik.tu-dortmund.de",
            comment = c(ORCID = "0000-0002-0007-4478")),
     person(given = "Fritz",

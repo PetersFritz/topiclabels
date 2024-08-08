@@ -71,7 +71,7 @@ Should a nice progress bar be shown? Turning it off, could lead to
 significantly faster calculation. Default ist \code{TRUE}.}
 }
 \value{
-[\code{named list}] \code{\link{lm_topic_labels}} object.
+[\code{named list}] \code{\link[topiclabels:as.lm_topic_labels]{lm_topic_labels}} object.
 }
 \description{
 Performs an automated labeling process of topics from topic models using

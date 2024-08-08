@@ -32,11 +32,10 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: 
+\strong{Maintainer}: Jonas Rieger \email{rieger@statistik.tu-dortmund.de} (\href{https://orcid.org/0000-0002-0007-4478}{ORCID})
 
 Authors:
 \itemize{
-  \item Jonas Rieger \email{rieger@statistik.tu-dortmund.de} (\href{https://orcid.org/0000-0002-0007-4478}{ORCID})
   \item Fritz Peters \email{fpeters3@sheffield.ac.uk} (\href{https://orcid.org/0009-0003-8471-4931}{ORCID})
   \item Andreas Fischer \email{andreasfischer1985@web.de} (\href{https://orcid.org/0009-0006-0748-6076}{ORCID})
   \item Tim Lauer \email{tl@leibniz-psychology.org} (\href{https://orcid.org/0009-0003-1625-1672}{ORCID})

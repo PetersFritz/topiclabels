@@ -1,4 +1,6 @@
 # topiclabels
+[![CRAN](https://www.r-pkg.org/badges/version/topiclabels)](https://cran.r-project.org/package=topiclabels)
+[![R build status](https://github.com/PetersFritz/topiclabels/workflows/R-CMD-check/badge.svg)](https://github.com/PetersFritz/topiclabels/actions)
 
 ## Automated Topic Labeling with Language Models
 
@@ -8,7 +10,7 @@ topiclabels leverages (large) language models for automatic topic labeling. The 
 
 *Related work*:
 * [Li et al. (2023). Can Large Language Models (LLM) label topics from a topic model?](https://osf.io/preprints/socarxiv/23x4m)
-* [Grootendorst (2023). Topic Modeling with Llama 2. Create easily interpretable topics with Large Language Models](https://maartengrootendorst.substack.com/p/topic-modeling-with-llama-2?trk=feed_main-feed-card_feed-article-content)
+* [Grootendorst (2023). Topic Modeling with Llama 2. Create easily interpretable topics with Large Language Models](https://newsletter.maartengrootendorst.com/p/topic-modeling-with-llama-2?trk=feed_main-feed-card_feed-article-content)
 
 *Topic models (selection)*:
 * [BERTopic](https://github.com/MaartenGr/BERTopic)
@@ -23,6 +25,10 @@ For bug reports (lack of documentation, misleading or wrong documentation, unexp
 Pull requests are welcome and will be included at the discretion of the author.
 
 ## Installation
+You can install the recent CRAN version using 
+``` r
+install.packages("topiclabels")
+```
 
 For installation of the development version use [devtools](https://cran.r-project.org/package=devtools):
 
