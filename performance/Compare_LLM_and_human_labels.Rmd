@@ -35,20 +35,42 @@ In the following, we compare the automatically generated topic labels with the l
 
 ## Set file path
 
-```{r}
+```{r include=FALSE}
 path <- "U:/R Projekte/topiclabels/performance"
+```
+
+```{r eval=FALSE, include=TRUE}
+path <- "your_path"
 ```
 
 ## Load the package and API token
 
-```{r warning=FALSE}
+```{r warning=FALSE, include=FALSE}
 # https://github.com/PetersFritz/topiclabels
 devtools::load_all()
 
-# The package is best used with a (free) HuggingFace token
+# Load your (free) HuggingFace token
 # https://huggingface.co/docs/hub/security-tokens
 hf_token <- readLines("U:/R Projekte/HuggingFace_token.txt")
 ```
+
+```{r eval=FALSE, include=TRUE}
+# CRAN version:
+install.packages("topiclabels")
+
+# development version:
+devtools::install_github("PetersFritz/topiclabels")
+```
+
+```{r eval=FALSE, include=TRUE}
+library("topiclabels")
+
+# Load your HuggingFace token.
+# HOW TO GET A FREE TOKEN: see
+# https://huggingface.co/docs/hub/security-tokens
+hf_token <- readLines("HuggingFace_token.txt")
+```
+
 
 ## Examples
 
@@ -647,23 +669,11 @@ jss_TM <- readRDS(paste0(path, "/jss_TM.RDS"))
 topics_topicmodels <- topicmodels::terms(jss_TM, 5)
 topics_topicmodels[,1:5]
 ```
-
-First, we transform the output to vectors of top terms.
-
-```{r}
-# transform topics to list of vectors
-topicmodels2tl <- function(x){
-  unname(apply(x, 2, paste, collapse = ", "))
-}
-
-topics_topicmodels_vectors <- topicmodels2tl(topics_topicmodels[,1:5])
-```
-
-Next, these top terms are used as input for our `label_topics` function.
+These top terms are used as input for our `label_topics` function:
 
 ```{r}
 # label_topics
-labels_topicmodels <- label_topics(as.list(topics_topicmodels_vectors), context = "Journal of Statistical Software", token = hf_token)
+labels_topicmodels <- label_topics(topics_topicmodels, context = "Journal of Statistical Software", token = hf_token)
 
 labels_topicmodels
 ```
@@ -705,52 +715,30 @@ poliblogPrevFit <- readRDS(paste0(path, "/poliblogPrevFit.RDS"))
 
 ```{r}
 # get topics
-topics_stm <- stm::labelTopics(poliblogPrevFit)
+topics_stm <- stm::labelTopics(poliblogPrevFit, c(3, 7, 20))
 
 # show the topics 3, 7, and 20 (as in vignette)
 stm::labelTopics(poliblogPrevFit, c(3, 7, 20))
 ```
 
-First, we transform the output to vectors of top terms (using the most probable terms "prob").
+For STM topics, you can choose the type of term profiles. STM offers "prob", "frex", "lift", "score" (see [stm vignette](https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf)), which you can specify using the `stm_type` argument. By default, "prob" is used.
 
 ```{r}
-# transform topics to list of vectors
-stm2tl <- function(x, type = "prob"){
-  
-  if (type == "prob"){res <- apply(x$prob, 1, paste, collapse = ", ")}
-  if (type == "frex"){res <- apply(x$frex, 1, paste, collapse = ", ")}
-  if (type == "lift"){res <- apply(x$lift, 1, paste, collapse = ", ")}
-  if (type == "score"){res <- apply(x$score, 1, paste, collapse = ", ")}
-  
-  return(res)
- 
-}
-
-topics_stm_vectors <- stm2tl(topics_stm)
-```
-
-Next, these top terms are used as input for our `label_topics` function.
-
-```{r}
-# label_topics
-labels_stm <- label_topics(as.list(topics_stm_vectors), context = "blogposts about American
+# label_topics: default stm_type ("prob")
+labels_stm <- label_topics(topics_stm, context = "blogposts about American
 politics", token = hf_token)
 
 labels_stm
 ```
 
-Interestingly, two topics have not been labeled: Topics 12 and 13. Let's see if it works without context:
-
 ```{r}
-labels_stm_nocontext <- label_topics(as.list(topics_stm_vectors), token = hf_token)
-labels_stm_nocontext
+# label_topics: frex
+labels_stm_frex <- label_topics(topics_stm, stm_type = "frex", context = "blogposts about American politics", token = hf_token)
+
+labels_stm_frex
 ```
 
-Now all topics are labeled. In the package [vignette](https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf) (page 19), Topic 3 is labeled as "Obama", Topic 7 as "Sarah Palin", and Topic 20 as "Bush Presidency". This matches our topic labels very well:
-
-```{r}
-labels_stm_nocontext$labels[c(3,7,20)]
-```
+In the package [vignette](https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf) (page 19), Topic 3 is labeled as "Obama", Topic 7 as "Sarah Palin", and Topic 20 as "Bush Presidency".
 
 ## BTM
 
@@ -795,22 +783,11 @@ topics_btm <- terms(BTM_model)
 topics_btm[[1]]
 ```
 
-First, we transform the output to vectors of top terms.
-
-```{r}
-# transform topics to list of vectors
-btm2tl <- function(x){
-  unlist(lapply(x, function(y){paste(y$token, collapse = ", ")}))
-}
-
-topics_btm_vectors <- btm2tl(topics_btm)
-```
-
-Next, these top terms are used as input for our `label_topics` function.
+These top terms are used as input for our `label_topics` function:
 
 ```{r}
 # label_topics
-labels_btm <- label_topics(as.list(topics_btm_vectors), context = "Reviews of AirBnB customers on Brussels address locations", token = hf_token)
+labels_btm <- label_topics(topics_btm, context = "Reviews of AirBnB customers on Brussels address locations", token = hf_token)
 
 labels_btm 
 ```
@@ -846,24 +823,14 @@ res <- readRDS(paste0(path, "/res.RDS"))
 library(ldaPrototype)
 topics_ldaproto <- tosca::topWords(getTopics(getLDA(res)), 10)
 
+topics_ldaproto
 ```
 
-First, we transform the output to vectors of top terms.
-
-```{r}
-# transform topics to list of vectors
-ldaproto2tl <- function(x){
-  unname(apply(x, 2, paste, collapse = ", "))
-}
-
-topics_ldaproto_vectors <- ldaproto2tl(topics_ldaproto)
-```
-
-Next, these top terms are used as input for our `label_topics` function.
+These top terms are used as input for our `label_topics` function.
 
 ```{r}
 # label_topics
-labels_ldaproto <- label_topics(as.list(topics_ldaproto_vectors), context = "Reuters news data", token = hf_token)
+labels_ldaproto <- label_topics(topics_ldaproto, context = "Reuters news data", token = hf_token)
 
 labels_ldaproto
 ```

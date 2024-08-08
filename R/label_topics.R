@@ -111,14 +111,23 @@ label_topics = function(
     max_length_label = 5L,
     prompt_type = c("json", "plain", "json-roles"),
     max_wait = 0L,
-    progress = TRUE){
+    progress = TRUE,
+    stm_type = c("prob", "frex", "lift", "score")){
 
   prompt_type = match.arg(prompt_type)
+  stm_type = match.arg(stm_type)
   params = c(params, .default_model_params(model))
   params = params[!duplicated(names(params))]
   if(!is.list(terms)){
     if(is.matrix(terms)) terms = unname(as.list(as.data.frame(terms)))
     else terms = list(terms)
+  }
+  if(class(terms) == "labelTopics"){
+    terms <- apply(terms[[stm_type]], 1, paste, collapse = ", ")
+    terms <- as.list(terms)
+  }
+  if(is.list(terms) & class(terms[[1]]) == "data.frame"){
+    terms = lapply(terms, function(y){paste(y$token, collapse = ", ")})
   }
   k = length(terms)
 
@@ -133,6 +142,7 @@ label_topics = function(
   assert_character(sep_terms, len = 1, any.missing = FALSE)
   assert_int(max_length_label)
   assert_character(prompt_type, len = 1, any.missing = FALSE)
+  assert_character(stm_type, len = 1, any.missing = FALSE)
   assert_int(max_wait)
   assert_logical(progress, len = 1, any.missing = FALSE)
 
