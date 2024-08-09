@@ -15,7 +15,7 @@ output:
 
 # Summary
 
-Our proposed R package leverages Large Language models (LLM) for automatic topic labeling. The main function `label_topics()` takes a list of top terms as input and generates a label for each topic. Hence, it is complementary to any topic modeling package that produces a list of top terms for each topic.
+Our proposed R package leverages (Large) Language Models (LLM) for automatic topic labeling. The main function `label_topics()` takes a list of top terms as input and generates a label for each topic. Hence, it is complementary to any topic modeling package that produces a list of top terms for each topic.
 
 While human judgement is indispensable for topic validation (i.e., inspecting top terms and most representative documents), automatic topic labeling can be a valuable tool for researchers in scenarios such as:
 
@@ -51,7 +51,7 @@ devtools::load_all()
 
 # Load your (free) HuggingFace token
 # https://huggingface.co/docs/hub/security-tokens
-hf_token <- readLines("U:/R Projekte/HuggingFace_token.txt")
+token <- readLines("U:/R Projekte/HuggingFace_token.txt")
 ```
 
 ```{r eval=FALSE, include=TRUE}
@@ -63,35 +63,249 @@ devtools::install_github("PetersFritz/topiclabels")
 ```
 
 ```{r eval=FALSE, include=TRUE}
+# load package
 library("topiclabels")
+```
 
+```{r eval=FALSE, include=TRUE}
 # Load your HuggingFace token.
 # HOW TO GET A FREE TOKEN: see
 # https://huggingface.co/docs/hub/security-tokens
-hf_token <- readLines("HuggingFace_token.txt")
+token <- readLines("HuggingFace_token.txt")
 ```
-
 
 ## Examples
 
 The following examples illustrate how to use the `label_topics()` function:
 
 ```{r}
-# Label two topics with a token:
-label_topics(list("tree, plants, wood, fox, forest", "weapon, gun, sniper"), token = hf_token)
+# label a topics
+label_topics(c("zidane", "figo", "kroos"), token = token)
 ```
 
 ```{r}
-# Specify the LLM to be used
-label_topics(list("tree, plants, wood, fox, forest", "weapon, gun, sniper"), model = "HuggingFaceH4/zephyr-7b-beta", token = hf_token)
+# label two topics
+label_topics(list(c("zidane", "figo", "kroos"), c("gas", "power", "wind")), token = token)
+```
+
+```{r}
+# Specify the language model to be used
+label_topics(list(c("zidane", "figo", "kroos"), c("gas", "power", "wind")), model = "HuggingFaceH4/zephyr-7b-beta", token = )
 ```
 
 ```{r}
 # Provide the topical context of the corpus
-label_topics(list("tree, plants, wood, fox, forest", "weapon, gun, sniper"), context = "Second World War", token = hf_token)
+label_topics(c("gas", "power", "wind"), context = "texts about cars and their features", token = token)
 ```
 
-# Comparison with human labels
+# How to use the topiclabels package with other topic modeling packages
+
+Our proposed R package can be used with other topic modeling packages as well. The only requirement is that the topic modeling package provides a function to extract the top terms of each topic. The user can then provide these top terms to the `label_topics` function. The `label_topics` function will then generate the topic labels based on the provided top terms.
+
+In the following, we will illustrate this for different popular R packages (see Wiedemann, 2002, <http://dx.doi.org/10.5771/1615-634X-2022-3-286>)
+
+## topicmodels
+
+We use the example from the package vignette (Grün & Hornik, 2024): <https://cran.r-project.org/web/packages/topicmodels/vignettes/topicmodels.pdf>
+
+```{r eval=FALSE, echo=TRUE}
+# load data
+library(topicmodels)
+data("JSS_papers", package = "topicmodels")
+
+# transform to corpus
+library(tm)
+corpus <- Corpus(VectorSource(unlist(JSS_papers[, "description"])))
+JSS_dtm <- DocumentTermMatrix(corpus,
+ control = list(stemming = TRUE, stopwords = TRUE, minWordLength = 3,
+ removeNumbers = TRUE, removePunctuation = TRUE))
+```
+
+```{r eval=FALSE, echo=TRUE}
+# run topic model
+jss_TM <- LDA(JSS_dtm, k = 30, control = list(seed = 2010))
+
+# save
+saveRDS(jss_TM, file = paste0(path, "/jss_TM.RDS"))
+```
+
+```{r include=FALSE}
+# load
+jss_TM <- readRDS(paste0(path, "/jss_TM.RDS"))
+```
+
+```{r}
+# get topics
+topics_topicmodels <- topicmodels::terms(jss_TM, 5)
+topics_topicmodels[,1:5]
+```
+These top terms are used as input for our `label_topics` function:
+
+```{r}
+# label_topics
+labels_topicmodels <- label_topics(topics_topicmodels, context = "Journal of Statistical Software", token = )
+
+labels_topicmodels
+```
+
+## stm
+
+We use the example from the package vignette (Roberts et al., 2019): <https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf>
+
+```{r eval=FALSE, echo=TRUE}
+data <- read.csv("https://raw.githubusercontent.com/dondealban/learning-stm/master/data/poliblogs2008.csv")
+```
+
+```{r eval=FALSE, echo=TRUE}
+# preprocessing
+library(stm)
+processed <- textProcessor(data$documents, metadata = data)
+```
+
+```{r eval=FALSE, echo=TRUE}
+# corpus preparation
+out <- prepDocuments(processed$documents, processed$vocab, processed$meta, lower.thresh = 15)
+```
+
+```{r eval=FALSE, echo=TRUE}
+# stm topic model
+poliblogPrevFit <- stm(documents = out$documents, vocab = out$vocab,
+ K = 20, prevalence =~ rating + s(day),
+ max.em.its = 75, data = out$meta,
+ init.type = "Spectral")
+
+# save
+saveRDS(poliblogPrevFit, file = paste0(path, "/poliblogPrevFit.RDS"))
+```
+
+```{r include=FALSE}
+# load
+poliblogPrevFit <- readRDS(paste0(path, "/poliblogPrevFit.RDS"))
+```
+
+```{r}
+# get topics
+topics_stm <- stm::labelTopics(poliblogPrevFit, c(3, 7, 20))
+
+# show the topics 3, 7, and 20 (as in vignette)
+stm::labelTopics(poliblogPrevFit, c(3, 7, 20))
+```
+
+For STM topics, you can choose the type of term profiles. STM offers "prob", "frex", "lift", "score" (see [stm vignette](https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf)), which you can specify using the `stm_type` argument. By default, "prob" is used.
+
+```{r}
+# label_topics: default stm_type ("prob")
+labels_stm <- label_topics(topics_stm, context = "blogposts about American
+politics", token = token)
+
+labels_stm
+```
+
+```{r}
+# label_topics: frex
+labels_stm_frex <- label_topics(topics_stm, stm_type = "frex", context = "blogposts about American politics", token = token)
+
+labels_stm_frex
+```
+
+In the package [vignette](https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf) (page 19), Topic 3 is labeled as "Obama", Topic 7 as "Sarah Palin", and Topic 20 as "Bush Presidency".
+
+## BTM
+
+We use the example from the package reference manual (Wijffels, 2023): <https://cran.r-project.org/web/packages/BTM/BTM.pdf>
+
+```{r eval=FALSE, echo=TRUE}
+# load data
+library(udpipe)
+data("brussels_reviews_anno", package = "udpipe")
+
+# prepare data
+x <- subset(brussels_reviews_anno, language == "nl")
+x <- subset(x, xpos %in% c("NN", "NNP", "NNS"))
+x <- x[, c("doc_id", "lemma")]
+
+```
+
+```{r eval=FALSE, echo=TRUE}
+library(BTM)
+set.seed(123456)
+BTM_model <- BTM(x, k = 5, alpha = 1, beta = 0.01, iter = 10, trace = TRUE)
+
+saveRDS(BTM_model, file = paste0(path, "/BTM_model.RDS"))
+
+topics_btm <- terms(BTM_model) # causes issues when knitting, thus saved here and loaded below
+saveRDS(topics_btm, file = paste0(path, "/topics_btm.RDS"))
+```
+
+```{r include=FALSE}
+# load
+BTM_model <- readRDS(paste0(path, "/BTM_model.RDS"))
+topics_btm <- readRDS(paste0(path, "/topics_btm.RDS"))
+```
+
+```{r eval=FALSE, echo=TRUE}
+# get topic terms
+topics_btm <- terms(BTM_model)
+```
+
+```{r}
+# show topic 1
+topics_btm[[1]]
+```
+
+These top terms are used as input for our `label_topics` function:
+
+```{r}
+# label_topics
+labels_btm <- label_topics(topics_btm, context = "Reviews of AirBnB customers on Brussels address locations", token = token)
+
+labels_btm 
+```
+
+As we can see, the LLM `mistralai/Mixtral-8x7B-Instruct-v0.1` can also handle Dutch top terms and generates English labels. The labels are relatively similar, but so are the top terms of the BTM example data.
+
+## ldaPrototype
+
+We use the example from the package GitHub repository (see also Rieger, 2020): <https://github.com/JonasRieger/ldaPrototype>
+
+```{r eval=FALSE, echo=TRUE, message=FALSE}
+# load data
+library(ldaPrototype)
+data(reuters_docs)
+data(reuters_vocab)
+```
+
+```{r eval=FALSE, echo=TRUE, message=FALSE}
+# ldaPrototype topic model
+res = LDAPrototype(docs = reuters_docs, vocabLDA = reuters_vocab, n = 4, K = 10, seeds = 1:4)
+
+# save
+saveRDS(res, file = paste0(path, "/res.RDS"))
+```
+
+```{r include=FALSE}
+# load
+res <- readRDS(paste0(path, "/res.RDS"))
+```
+
+```{r}
+# get topics
+library(ldaPrototype)
+topics_ldaproto <- tosca::topWords(getTopics(getLDA(res)), 10)
+
+topics_ldaproto
+```
+
+These top terms are used as input for our `label_topics` function.
+
+```{r}
+# label_topics
+labels_ldaproto <- label_topics(topics_ldaproto, context = "Reuters news data", token = token)
+
+labels_ldaproto
+```
+
+# Performance evaluation
 
 To evaluate the performance of the `label_topics()` function, we compare the automatically generated labels with human labels from various studies. Inclusion criteria for the studies were:
 
@@ -122,12 +336,10 @@ human_labels <- read_sheet("1UcumvMI-j4ehNUVF-_DWc5cdkOsM8QbTGOPJ10wGZTw")
 as.data.frame(human_labels[1:5, c(1,3:4)])
 ```
 
-# Topic labeling with LLM
-
 ## Standard labeling
 
 ```{r eval=FALSE, echo=TRUE}
-LLM_labels <- label_topics(as.list(human_labels$Top_Terms), token = hf_token)
+LLM_labels <- label_topics(as.list(human_labels$Top_Terms), token = token)
 
 # save
 saveRDS(LLM_labels, file = paste0(path, "/LLM_labels.RDS"))
@@ -156,7 +368,7 @@ The following function retrieves the sentence embeddings for a given list of lab
 # using the HuggingFace API and the code from:
 # https://github.com/AndreasFischer1985/code-snippets/blob/master/R/huggingface_SentenceEmbeddingsTest.R
 
-get_embeddings <- function(prompts, model_id = "llmrails/ember-v1", api_token = hf_token) {
+get_embeddings <- function(prompts, model_id = "llmrails/ember-v1", api_token = token) {
   
   require("httr")
   e=list()
@@ -485,7 +697,7 @@ for (i in 1:length(context)){
   input <- human_labels$Top_Terms[human_labels$Study == study]
   
   # label_topics with context
-  LLM_labels_context[[i]] <- label_topics(as.list(input), context = context[i], token = hf_token)
+  LLM_labels_context[[i]] <- label_topics(as.list(input), context = context[i], token = token)
 }
 
 # save
@@ -585,7 +797,7 @@ Obviously, the LLM used the provided context as label for all topics. Let's try 
 Kwon_input <- human_labels$Top_Terms[human_labels$Study == "Kwon 2023"]
 # Kwon_context <- "Racial equity in urban planning" # original context
 Kwon_context <- "Racial Equity and Justice in Urban Studies and Planning"
-Kwon_labels <- label_topics(as.list(Kwon_input), context = Kwon_context, token = hf_token)
+Kwon_labels <- label_topics(as.list(Kwon_input), context = Kwon_context, token = token)
 Kwon_labels
 ```
 
@@ -628,216 +840,9 @@ Overall, the topics generated by the LLM show a satisfactory similarity to the h
 
 Automated topic labels can be a valuable tool for researchers to quickly get an overview of the topics in a corpus. However, the LLM-generated labels should be used with caution and only as complementary tool to human judgement and proper topic validation.
 
-# How to use the topiclabels package with other topic modeling packages
-
-Our proposed R package can be used with other topic modeling packages as well. The only requirement is that the topic modeling package provides a function to extract the top terms of each topic. The user can then provide these top terms to the `label_topics` function. The `label_topics` function will then generate the topic labels based on the provided top terms.
-
-In the following, we will illustrate this for different popular R packages (see Wiedemann, 2002, <http://dx.doi.org/10.5771/1615-634X-2022-3-286>)
-
-## topicmodels
-
-We use the example from the package vignette (Grün & Hornik, 2024): <https://cran.r-project.org/web/packages/topicmodels/vignettes/topicmodels.pdf>
-
-```{r eval=FALSE, echo=TRUE}
-# load data
-library(topicmodels)
-data("JSS_papers", package = "topicmodels")
-
-# transform to corpus
-library(tm)
-corpus <- Corpus(VectorSource(unlist(JSS_papers[, "description"])))
-JSS_dtm <- DocumentTermMatrix(corpus,
- control = list(stemming = TRUE, stopwords = TRUE, minWordLength = 3,
- removeNumbers = TRUE, removePunctuation = TRUE))
-```
-
-```{r eval=FALSE, echo=TRUE}
-# run topic model
-jss_TM <- LDA(JSS_dtm, k = 30, control = list(seed = 2010))
-
-# save
-saveRDS(jss_TM, file = paste0(path, "/jss_TM.RDS"))
-```
-
-```{r include=FALSE}
-# load
-jss_TM <- readRDS(paste0(path, "/jss_TM.RDS"))
-```
-
-```{r}
-# get topics
-topics_topicmodels <- topicmodels::terms(jss_TM, 5)
-topics_topicmodels[,1:5]
-```
-These top terms are used as input for our `label_topics` function:
-
-```{r}
-# label_topics
-labels_topicmodels <- label_topics(topics_topicmodels, context = "Journal of Statistical Software", token = hf_token)
-
-labels_topicmodels
-```
-
-## stm
-
-We use the example from the package vignette (Roberts et al., 2019): <https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf>
-
-```{r eval=FALSE, echo=TRUE}
-data <- read.csv("https://raw.githubusercontent.com/dondealban/learning-stm/master/data/poliblogs2008.csv")
-```
-
-```{r eval=FALSE, echo=TRUE}
-# preprocessing
-library(stm)
-processed <- textProcessor(data$documents, metadata = data)
-```
-
-```{r eval=FALSE, echo=TRUE}
-# corpus preparation
-out <- prepDocuments(processed$documents, processed$vocab, processed$meta, lower.thresh = 15)
-```
-
-```{r eval=FALSE, echo=TRUE}
-# stm topic model
-poliblogPrevFit <- stm(documents = out$documents, vocab = out$vocab,
- K = 20, prevalence =~ rating + s(day),
- max.em.its = 75, data = out$meta,
- init.type = "Spectral")
-
-# save
-saveRDS(poliblogPrevFit, file = paste0(path, "/poliblogPrevFit.RDS"))
-```
-
-```{r include=FALSE}
-# load
-poliblogPrevFit <- readRDS(paste0(path, "/poliblogPrevFit.RDS"))
-```
-
-```{r}
-# get topics
-topics_stm <- stm::labelTopics(poliblogPrevFit, c(3, 7, 20))
-
-# show the topics 3, 7, and 20 (as in vignette)
-stm::labelTopics(poliblogPrevFit, c(3, 7, 20))
-```
-
-For STM topics, you can choose the type of term profiles. STM offers "prob", "frex", "lift", "score" (see [stm vignette](https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf)), which you can specify using the `stm_type` argument. By default, "prob" is used.
-
-```{r}
-# label_topics: default stm_type ("prob")
-labels_stm <- label_topics(topics_stm, context = "blogposts about American
-politics", token = hf_token)
-
-labels_stm
-```
-
-```{r}
-# label_topics: frex
-labels_stm_frex <- label_topics(topics_stm, stm_type = "frex", context = "blogposts about American politics", token = hf_token)
-
-labels_stm_frex
-```
-
-In the package [vignette](https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf) (page 19), Topic 3 is labeled as "Obama", Topic 7 as "Sarah Palin", and Topic 20 as "Bush Presidency".
-
-## BTM
-
-We use the example from the package reference manual (Wijffels, 2023): <https://cran.r-project.org/web/packages/BTM/BTM.pdf>
-
-```{r eval=FALSE, echo=TRUE}
-# load data
-library(udpipe)
-data("brussels_reviews_anno", package = "udpipe")
-
-# prepare data
-x <- subset(brussels_reviews_anno, language == "nl")
-x <- subset(x, xpos %in% c("NN", "NNP", "NNS"))
-x <- x[, c("doc_id", "lemma")]
-
-```
-
-```{r eval=FALSE, echo=TRUE}
-library(BTM)
-set.seed(123456)
-BTM_model <- BTM(x, k = 5, alpha = 1, beta = 0.01, iter = 10, trace = TRUE)
-
-saveRDS(BTM_model, file = paste0(path, "/BTM_model.RDS"))
-
-topics_btm <- terms(BTM_model) # causes issues when knitting, thus saved here and loaded below
-saveRDS(topics_btm, file = paste0(path, "/topics_btm.RDS"))
-```
-
-```{r include=FALSE}
-# load
-BTM_model <- readRDS(paste0(path, "/BTM_model.RDS"))
-topics_btm <- readRDS(paste0(path, "/topics_btm.RDS"))
-```
-
-```{r eval=FALSE, echo=TRUE}
-# get topic terms
-topics_btm <- terms(BTM_model)
-```
-
-```{r}
-# show topic 1
-topics_btm[[1]]
-```
-
-These top terms are used as input for our `label_topics` function:
-
-```{r}
-# label_topics
-labels_btm <- label_topics(topics_btm, context = "Reviews of AirBnB customers on Brussels address locations", token = hf_token)
-
-labels_btm 
-```
-
-As we can see, the LLM `mistralai/Mixtral-8x7B-Instruct-v0.1` can also handle Dutch top terms and generates English labels. The labels are relatively similar, but so are the top terms of the BTM example data.
-
-## ldaPrototype
-
-We use the example from the package GitHub repository (see also Rieger, 2020): <https://github.com/JonasRieger/ldaPrototype>
-
-```{r eval=FALSE, echo=TRUE, message=FALSE}
-# load data
-library(ldaPrototype)
-data(reuters_docs)
-data(reuters_vocab)
-```
-
-```{r eval=FALSE, echo=TRUE, message=FALSE}
-# ldaPrototype topic model
-res = LDAPrototype(docs = reuters_docs, vocabLDA = reuters_vocab, n = 4, K = 10, seeds = 1:4)
-
-# save
-saveRDS(res, file = paste0(path, "/res.RDS"))
-```
-
-```{r include=FALSE}
-# load
-res <- readRDS(paste0(path, "/res.RDS"))
-```
-
-```{r}
-# get topics
-library(ldaPrototype)
-topics_ldaproto <- tosca::topWords(getTopics(getLDA(res)), 10)
-
-topics_ldaproto
-```
-
-These top terms are used as input for our `label_topics` function.
-
-```{r}
-# label_topics
-labels_ldaproto <- label_topics(topics_ldaproto, context = "Reuters news data", token = hf_token)
-
-labels_ldaproto
-```
-
 # References
 
-Bittermann, A., McNamara, D., Simonsmeier, B.A. et al. The Landscape of Research on Prior Knowledge and Learning: a Bibliometric Analysis. Educ Psychol Rev 35, 58 (2023). <https://doi.org/10.1007/s10648-023-09775-9> 
+Bittermann, A., McNamara, D., Simonsmeier, B.A., & Schneider, M. (2023). The Landscape of Research on Prior Knowledge and Learning: a Bibliometric Analysis. Educational Psychology Review, 35, 58. <https://doi.org/10.1007/s10648-023-09775-9> 
 
 Dwivedi, Y. K., Sharma, A., Rana, N. P., Giannakis, M., Goel, P., & Dutot, V. (2023). Evolution of artificial intelligence research in Technological Forecasting and Social Change: Research topics, trends, and future directions. Technological Forecasting and Social Change, 192, 122579. <https://doi.org/10.1016/j.techfore.2023.122579>
 

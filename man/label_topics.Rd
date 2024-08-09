@@ -84,7 +84,7 @@ Should a nice progress bar be shown? Turning it off, could lead to
 significantly faster calculation. Default ist \code{TRUE}.}
 
 \item{stm_type}{[\code{character(1)}]\cr
-EXPLAIN!}
+For stm topics, which type of word weighting should be used? Default is "prob".}
 }
 \value{
 [\code{named list}] \code{\link[topiclabels:as.lm_topic_labels]{lm_topic_labels}} object.

@@ -71,7 +71,7 @@
 #' differ mainly in how the response of the language model is requested. Examples
 #' are given in the details section. Default is the request of a json output.
 #' @param stm_type [\code{character(1)}]\cr
-#' EXPLAIN!
+#' For stm topics, which type of word weighting should be used? Default is "prob".
 #' @param max_wait [\code{integer(1)}]\cr
 #' In the case that the rate limit on Huggingface is reached: How long
 #' (in minutes) should the system wait until it asks the user whether
