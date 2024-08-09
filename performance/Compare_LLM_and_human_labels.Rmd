@@ -1,5 +1,5 @@
 ---
-title: 'topiclabels: An R Package for Automated Topic Labeling Using Large Language Models'
+title: 'topiclabels: An R Package for Automated Topic Labeling Using (Large) Language Models'
 author:
   - Jonas Rieger, TU Dortmund University, rieger@statistik.tu-dortmund.de
   - Fritz Peters, University of Sheffield, fpeters3@sheffield.ac.uk
@@ -90,7 +90,7 @@ label_topics(list(c("zidane", "figo", "kroos"), c("gas", "power", "wind")), toke
 
 ```{r}
 # Specify the language model to be used
-label_topics(list(c("zidane", "figo", "kroos"), c("gas", "power", "wind")), model = "HuggingFaceH4/zephyr-7b-beta", token = )
+label_topics(list(c("zidane", "figo", "kroos"), c("gas", "power", "wind")), model = "HuggingFaceH4/zephyr-7b-beta", token = token)
 ```
 
 ```{r}
@@ -143,7 +143,7 @@ These top terms are used as input for our `label_topics` function:
 
 ```{r}
 # label_topics
-labels_topicmodels <- label_topics(topics_topicmodels, context = "Journal of Statistical Software", token = )
+labels_topicmodels <- label_topics(topics_topicmodels, context = "Journal of Statistical Software", token = token)
 
 labels_topicmodels
 ```

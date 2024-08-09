@@ -16,7 +16,7 @@
 <meta name="author" content="André Bittermann, Leibniz Institute for Psychology (ZPID), abi@leibniz-psychology.org" />
 
 
-<title>topiclabels: An R Package for Automated Topic Labeling Using Large Language Models</title>
+<title>topiclabels: An R Package for Automated Topic Labeling Using (Large) Language Models</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1625,7 +1625,7 @@ display: none;
 
 
 <h1 class="title toc-ignore">topiclabels: An R Package for Automated
-Topic Labeling Using Large Language Models</h1>
+Topic Labeling Using (Large) Language Models</h1>
 <h4 class="author">Jonas Rieger, TU Dortmund University, <a href="mailto:rieger@statistik.tu-dortmund.de" class="email">rieger@statistik.tu-dortmund.de</a></h4>
 <h4 class="author">Fritz Peters, University of Sheffield, <a href="mailto:fpeters3@sheffield.ac.uk" class="email">fpeters3@sheffield.ac.uk</a></h4>
 <h4 class="author">Andreas Fischer, Forschungsinstitut Betriebliche
@@ -1648,12 +1648,17 @@ path</a></li>
 token</a></li>
 <li><a href="#examples" id="toc-examples">Examples</a></li>
 </ul></li>
-<li><a href="#comparison-with-human-labels" id="toc-comparison-with-human-labels">Comparison with human labels</a>
+<li><a href="#how-to-use-the-topiclabels-package-with-other-topic-modeling-packages" id="toc-how-to-use-the-topiclabels-package-with-other-topic-modeling-packages">How
+to use the topiclabels package with other topic modeling packages</a>
+<ul>
+<li><a href="#topicmodels" id="toc-topicmodels">topicmodels</a></li>
+<li><a href="#stm" id="toc-stm">stm</a></li>
+<li><a href="#btm" id="toc-btm">BTM</a></li>
+<li><a href="#ldaprototype" id="toc-ldaprototype">ldaPrototype</a></li>
+</ul></li>
+<li><a href="#performance-evaluation" id="toc-performance-evaluation">Performance evaluation</a>
 <ul>
 <li><a href="#retrieve-human-labels" id="toc-retrieve-human-labels">Retrieve human labels</a></li>
-</ul></li>
-<li><a href="#topic-labeling-with-llm" id="toc-topic-labeling-with-llm">Topic labeling with LLM</a>
-<ul>
 <li><a href="#standard-labeling" id="toc-standard-labeling">Standard
 labeling</a>
 <ul>
@@ -1689,21 +1694,13 @@ study</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#conclusion" id="toc-conclusion">Conclusion</a></li>
-<li><a href="#how-to-use-the-topiclabels-package-with-other-topic-modeling-packages" id="toc-how-to-use-the-topiclabels-package-with-other-topic-modeling-packages">How
-to use the topiclabels package with other topic modeling packages</a>
-<ul>
-<li><a href="#topicmodels" id="toc-topicmodels">topicmodels</a></li>
-<li><a href="#stm" id="toc-stm">stm</a></li>
-<li><a href="#btm" id="toc-btm">BTM</a></li>
-<li><a href="#ldaprototype" id="toc-ldaprototype">ldaPrototype</a></li>
-</ul></li>
 <li><a href="#references" id="toc-references">References</a></li>
 </ul>
 </div>
 
 <div id="summary" class="section level1">
 <h1>Summary</h1>
-<p>Our proposed R package leverages Large Language models (LLM) for
+<p>Our proposed R package leverages (Large) Language Models (LLM) for
 automatic topic labeling. The main function <code>label_topics()</code>
 takes a list of top terms as input and generates a label for each topic.
 Hence, it is complementary to any topic modeling package that produces a
@@ -1748,42 +1745,331 @@ install.packages(&quot;topiclabels&quot;)
 
 # development version:
 devtools::install_github(&quot;PetersFritz/topiclabels&quot;)</code></pre>
-<pre class="r"><code>library(&quot;topiclabels&quot;)
-
-# Load your HuggingFace token.
+<pre class="r"><code># load package
+library(&quot;topiclabels&quot;)</code></pre>
+<pre class="r"><code># Load your HuggingFace token.
 # HOW TO GET A FREE TOKEN: see
 # https://huggingface.co/docs/hub/security-tokens
-hf_token &lt;- readLines(&quot;HuggingFace_token.txt&quot;)</code></pre>
+token &lt;- readLines(&quot;HuggingFace_token.txt&quot;)</code></pre>
 </div>
 <div id="examples" class="section level2">
 <h2>Examples</h2>
 <p>The following examples illustrate how to use the
 <code>label_topics()</code> function:</p>
-<pre class="r"><code># Label two topics with a token:
-label_topics(list(&quot;tree, plants, wood, fox, forest&quot;, &quot;weapon, gun, sniper&quot;), token = hf_token)</code></pre>
+<pre class="r"><code># label a topics
+label_topics(c(&quot;zidane&quot;, &quot;figo&quot;, &quot;kroos&quot;), token = token)</code></pre>
+<pre><code>## Labeling 1 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
+<pre><code>## Labeling process finished</code></pre>
+<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
+##  1: Real Madrid Midfielders [zidane, figo, kroos]</code></pre>
+<pre class="r"><code># label two topics
+label_topics(list(c(&quot;zidane&quot;, &quot;figo&quot;, &quot;kroos&quot;), c(&quot;gas&quot;, &quot;power&quot;, &quot;wind&quot;)), token = token)</code></pre>
 <pre><code>## Labeling 2 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
 <pre><code>## Labeling process finished</code></pre>
 <pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
-##  1: Forest Animals and Vegetation [tree, plants, wood, fox, forest]
-##  2: Military Weapons [weapon, gun, sniper]</code></pre>
-<pre class="r"><code># Specify the LLM to be used
-label_topics(list(&quot;tree, plants, wood, fox, forest&quot;, &quot;weapon, gun, sniper&quot;), model = &quot;HuggingFaceH4/zephyr-7b-beta&quot;, token = hf_token)</code></pre>
+##  1: Real Madrid Midfielders [zidane, figo, kroos]
+##  2: Renewable Energy [gas, power, wind]</code></pre>
+<pre class="r"><code># Specify the language model to be used
+label_topics(list(c(&quot;zidane&quot;, &quot;figo&quot;, &quot;kroos&quot;), c(&quot;gas&quot;, &quot;power&quot;, &quot;wind&quot;)), model = &quot;HuggingFaceH4/zephyr-7b-beta&quot;, token = token)</code></pre>
 <pre><code>## Labeling 2 topic(s) using the language model HuggingFaceH4/zephyr-7b-beta and a Huggingface API token.</code></pre>
 <pre><code>## Labeling process finished</code></pre>
 <pre><code>## lm_topic_labels object generated using HuggingFaceH4/zephyr-7b-beta
-##  1: Nature Scene [tree, plants, wood, fox, forest]
-##  2: Military Weaponry [weapon, gun, sniper]</code></pre>
+##  1: Real Madrid midfielders [zidane, figo, kroos]
+##  2: Renewable Energy [gas, power, wind]</code></pre>
 <pre class="r"><code># Provide the topical context of the corpus
-label_topics(list(&quot;tree, plants, wood, fox, forest&quot;, &quot;weapon, gun, sniper&quot;), context = &quot;Second World War&quot;, token = hf_token)</code></pre>
-<pre><code>## Labeling 2 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
+label_topics(c(&quot;gas&quot;, &quot;power&quot;, &quot;wind&quot;), context = &quot;texts about cars and their features&quot;, token = token)</code></pre>
+<pre><code>## Labeling 1 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
 <pre><code>## Labeling process finished</code></pre>
 <pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
-##  1: Forest Animals and Vegetation [tree, plants, wood, fox, forest]
-##  2: Sniper Weapon [weapon, gun, sniper]</code></pre>
+##  1: Fuel Efficiency and Power [gas, power, wind]</code></pre>
 </div>
 </div>
-<div id="comparison-with-human-labels" class="section level1">
-<h1>Comparison with human labels</h1>
+<div id="how-to-use-the-topiclabels-package-with-other-topic-modeling-packages" class="section level1">
+<h1>How to use the topiclabels package with other topic modeling
+packages</h1>
+<p>Our proposed R package can be used with other topic modeling packages
+as well. The only requirement is that the topic modeling package
+provides a function to extract the top terms of each topic. The user can
+then provide these top terms to the <code>label_topics</code> function.
+The <code>label_topics</code> function will then generate the topic
+labels based on the provided top terms.</p>
+<p>In the following, we will illustrate this for different popular R
+packages (see Wiedemann, 2002, <a href="http://dx.doi.org/10.5771/1615-634X-2022-3-286" class="uri">http://dx.doi.org/10.5771/1615-634X-2022-3-286</a>)</p>
+<div id="topicmodels" class="section level2">
+<h2>topicmodels</h2>
+<p>We use the example from the package vignette (Grün &amp; Hornik,
+2024): <a href="https://cran.r-project.org/web/packages/topicmodels/vignettes/topicmodels.pdf" class="uri">https://cran.r-project.org/web/packages/topicmodels/vignettes/topicmodels.pdf</a></p>
+<pre class="r"><code># load data
+library(topicmodels)
+data(&quot;JSS_papers&quot;, package = &quot;topicmodels&quot;)
+
+# transform to corpus
+library(tm)
+corpus &lt;- Corpus(VectorSource(unlist(JSS_papers[, &quot;description&quot;])))
+JSS_dtm &lt;- DocumentTermMatrix(corpus,
+ control = list(stemming = TRUE, stopwords = TRUE, minWordLength = 3,
+ removeNumbers = TRUE, removePunctuation = TRUE))</code></pre>
+<pre class="r"><code># run topic model
+jss_TM &lt;- LDA(JSS_dtm, k = 30, control = list(seed = 2010))
+
+# save
+saveRDS(jss_TM, file = paste0(path, &quot;/jss_TM.RDS&quot;))</code></pre>
+<pre class="r"><code># get topics
+topics_topicmodels &lt;- topicmodels::terms(jss_TM, 5)
+topics_topicmodels[,1:5]</code></pre>
+<pre><code>##      Topic 1   Topic 2     Topic 3   Topic 4   Topic 5  
+## [1,] &quot;network&quot; &quot;algorithm&quot; &quot;data&quot;    &quot;use&quot;     &quot;cluster&quot;
+## [2,] &quot;data&quot;    &quot;packag&quot;    &quot;statist&quot; &quot;www&quot;     &quot;model&quot;  
+## [3,] &quot;model&quot;   &quot;data&quot;      &quot;use&quot;     &quot;statist&quot; &quot;packag&quot; 
+## [4,] &quot;packag&quot;  &quot;provid&quot;    &quot;method&quot;  &quot;java&quot;    &quot;method&quot; 
+## [5,] &quot;use&quot;     &quot;function&quot;  &quot;infer&quot;   &quot;can&quot;     &quot;can&quot;</code></pre>
+<p>These top terms are used as input for our <code>label_topics</code>
+function:</p>
+<pre class="r"><code># label_topics
+labels_topicmodels &lt;- label_topics(topics_topicmodels, context = &quot;Journal of Statistical Software&quot;, token = token)</code></pre>
+<pre><code>## Labeling 30 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
+<pre><code>## Labeling process finished</code></pre>
+<pre class="r"><code>labels_topicmodels</code></pre>
+<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
+##  1: Network Analysis [network, data, model, packag, use]
+##  2: Data Analysis Tools [algorithm, packag, data, provid, function]
+##  3: Statistical Methods [data, statist, use, method, infer]
+##  4: Statistical Software [use, www, statist, java, can]
+##  5: Clustering Methods [cluster, model, packag, method, can]
+##  6: Data Visualization [packag, model, use, method, graphic]
+##  7: Data Analysis and Visualization [data, use, packag, imag, method]
+##  8: Smooth Model Fitting [use, model, smooth, fit, program]
+##  9: Statistical Modeling [model, estim, packag, data, function]
+##  10: Tumor Detection Tools [test, tool, polyk, tumor, wave]
+##  11: Modeling functions [model, packag, function, fit, provid]
+##  12: Statistical programming in Lisp [use, statist, packag, can, lispstat]
+##  13: Software packages and solutions [code, packag, solv, use, problem]
+##  14: Regression Model [model, variabl, standard, confid, regress]
+##  15: Statistical Software Packages [model, packag, use, data, softwar]
+##  16: Statistical Methods [estim, statist, packag, method, use]
+##  17: Model Selection and Evaluation [model, data, use, term, miss]
+##  18: Software Development [method, design, function, packag, paper]
+##  19: Statistical Computing Methods [method, statist, use, paper, comput]
+##  20: Modeling methods for graphs [model, method, graph, use, popul]
+##  21: Statistical modeling packages [test, statist, packag, model, distribut]
+##  22: Statistical Computing [formula, use, sampl, comput, statist]
+##  23: Statistical Modeling [model, regress, algorithm, problem, data]
+##  24: Density Function Computation [densiti, function, use, provid, comput]
+##  25: Software performance evaluation [softwar, use, roc, curv, comput]
+##  26: Data Visualization Packages [graphic, interfac, data, user, packag]
+##  27: Multivariate Analysis [analysi, data, multivari, packag, scale]
+##  28: Statistical Testing [test, data, random, generat, matric]
+##  29: Sampling and Estimation Methods [sampl, use, estim, method, data]
+##  30: Maximum Likelihood Estimation [model, estim, respons, likelihood, maximum]</code></pre>
+</div>
+<div id="stm" class="section level2">
+<h2>stm</h2>
+<p>We use the example from the package vignette (Roberts et al., 2019):
+<a href="https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf" class="uri">https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf</a></p>
+<pre class="r"><code>data &lt;- read.csv(&quot;https://raw.githubusercontent.com/dondealban/learning-stm/master/data/poliblogs2008.csv&quot;)</code></pre>
+<pre class="r"><code># preprocessing
+library(stm)
+processed &lt;- textProcessor(data$documents, metadata = data)</code></pre>
+<pre class="r"><code># corpus preparation
+out &lt;- prepDocuments(processed$documents, processed$vocab, processed$meta, lower.thresh = 15)</code></pre>
+<pre class="r"><code># stm topic model
+poliblogPrevFit &lt;- stm(documents = out$documents, vocab = out$vocab,
+ K = 20, prevalence =~ rating + s(day),
+ max.em.its = 75, data = out$meta,
+ init.type = &quot;Spectral&quot;)
+
+# save
+saveRDS(poliblogPrevFit, file = paste0(path, &quot;/poliblogPrevFit.RDS&quot;))</code></pre>
+<pre class="r"><code># get topics
+topics_stm &lt;- stm::labelTopics(poliblogPrevFit, c(3, 7, 20))
+
+# show the topics 3, 7, and 20 (as in vignette)
+stm::labelTopics(poliblogPrevFit, c(3, 7, 20))</code></pre>
+<pre><code>## Topic 3 Top Words:
+##       Highest Prob: obama, barack, campaign, biden, polit, will, debat 
+##       FREX: ayer, barack, obama, wright, biden, jeremiah, joe 
+##       Lift: oct, goolsbe, ayerss, ayr, bernadin, ayer, annenberg 
+##       Score: oct, obama, barack, ayer, wright, campaign, biden 
+## Topic 7 Top Words:
+##       Highest Prob: palin, governor, sarah, state, alaska, polit, senat 
+##       FREX: blagojevich, palin, sarah, rezko, alaska, governor, gov 
+##       Lift: jindal, blagojevich, juneau, monegan, blago, burri, wasilla 
+##       Score: monegan, palin, blagojevich, sarah, alaska, rezko, governor 
+## Topic 20 Top Words:
+##       Highest Prob: bush, presid, administr, said, hous, white, report 
+##       FREX: cheney, tortur, cia, administr, interrog, bush, perino 
+##       Lift: addington, fratto, perino, mcclellan, feith, plame, cheney 
+##       Score: addington, bush, tortur, perino, cia, cheney, administr</code></pre>
+<p>For STM topics, you can choose the type of term profiles. STM offers
+“prob”, “frex”, “lift”, “score” (see <a href="https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf">stm
+vignette</a>), which you can specify using the <code>stm_type</code>
+argument. By default, “prob” is used.</p>
+<pre class="r"><code># label_topics: default stm_type (&quot;prob&quot;)
+labels_stm &lt;- label_topics(topics_stm, context = &quot;blogposts about American
+politics&quot;, token = token)</code></pre>
+<pre><code>## Labeling 20 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
+<pre><code>## Labeling process finished</code></pre>
+<pre class="r"><code>labels_stm</code></pre>
+<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
+##  1: Obama&#39;s Lead in Polls [obama, poll, mccain, voter, state, democra...]
+##  2: Public Opinion on Politics [peopl, think, polit, like, right, just, one]
+##  3: Obama-Biden Political Campaign [obama, barack, campaign, biden, polit, wil...]
+##  4: Informal language and negation [get, one, like, just, want, can, dont]
+##  5: Energy Policy and Prices [oil, energi, will, price, drill, gas, product]
+##  6: US Political Campaigns [elect, vote, voter, campaign, republican, ...]
+##  7: Alaska Governor Sarah Palin [palin, governor, sarah, state, alaska, pol...]
+##  8: Government Finances [tax, money, million, financi, govern, spen...]
+##  9: Media and News [media, time, report, news, stori, press, new]
+##  10: Congressional Legislation [democrat, senat, bill, republican, vote, h...]
+##  11: Legal and Court Proceedings [law, court, state, right, case, rule, legal]
+##  12: Iraq War and Military [iraq, war, militari, iraqi, troop, forc, will]
+##  13: Iranian Nuclear Program [iran, nuclear, world, state, nation, will,...]
+##  14: American people&#39;s work and care [will, american, america, peopl, care, work...]
+##  15: Terrorism in Middle East [terrorist, attack, israel, kill, terror, g...]
+##  16: Diverse Life Experiences [one, will, film, women, allah, life, day]
+##  17: Global Warming and Research [global, warm, univers, abort, studi, resea...]
+##  18: John McCain&#39;s Campaign [mccain, john, said, campaign, sen, say, think]
+##  19: Hillary Clinton&#39;s Democratic Primary Campaign [clinton, hillari, will, democrat, primari,...]
+##  20: Bush Administration [bush, presid, administr, said, hous, white...]</code></pre>
+<pre class="r"><code># label_topics: frex
+labels_stm_frex &lt;- label_topics(topics_stm, stm_type = &quot;frex&quot;, context = &quot;blogposts about American politics&quot;, token = token)</code></pre>
+<pre><code>## Labeling 20 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
+<pre><code>## Labeling process finished</code></pre>
+<pre class="r"><code>labels_stm_frex</code></pre>
+<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
+##  1: Pennsylvania-Virginia Polling [poll, pennsylvania, virginia, percent, mar...]
+##  2: Religious Conservatism [church, digbi, liber, black, linktocomment...]
+##  3: Obama&#39;s Pastor Controversy [ayer, barack, obama, wright, biden, jeremi...]
+##  4: Negative Sentiments [cant, eastern, doesnt, isnt, didnt, clip, ...]
+##  5: Energy and Oil Prices [drill, oil, mugab, energi, gas, price, pro...]
+##  6: Minnesota Senate Recount [franken, coleman, ballot, registr, acorn, ...]
+##  7: Illinois and Alaska Governors [blagojevich, palin, sarah, rezko, alaska, ...]
+##  8: Housing finance [financi, loan, fanni, mortgag, taxpay, fre...]
+##  9: Matthew O&#39;Reilly Media Coverage [matthew, media, journalist, coverag, stori...]
+##  10: Democratic Leadership [legisl, pelosi, reid, bipartisan, fisa, na...]
+##  11: Constitutional Law [court, illeg, law, constitut, prosecut, le...]
+##  12: Iraqi Politics and Security [maliki, petraeus, iraqi, baghdad, iraq, tr...]
+##  13: Middle East Nuclear Tensions [russian, russia, iran, nuclear, iranian, p...]
+##  14: Healthcare and Labor [health, care, union, educ, america, job, w...]
+##  15: Middle East Politics [palestinian, hama, musharraf, pakistan, pa...]
+##  16: Islamic Religious Film [film, allah, muhammad, girl, qur, vers, un...]
+##  17: Climate Change [warm, abort, scientist, climat, scientif, ...]
+##  18: Conservative Pundits [mccain, raz, john, sen, clark, hanniti, kr...]
+##  19: Clinton vs. Romney in Primaries [hillari, clinton, huckabe, deleg, romney, ...]
+##  20: Bush-era Torture Policies [cheney, tortur, cia, administr, interrog, ...]</code></pre>
+<p>In the package <a href="https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf">vignette</a>
+(page 19), Topic 3 is labeled as “Obama”, Topic 7 as “Sarah Palin”, and
+Topic 20 as “Bush Presidency”.</p>
+</div>
+<div id="btm" class="section level2">
+<h2>BTM</h2>
+<p>We use the example from the package reference manual (Wijffels,
+2023): <a href="https://cran.r-project.org/web/packages/BTM/BTM.pdf" class="uri">https://cran.r-project.org/web/packages/BTM/BTM.pdf</a></p>
+<pre class="r"><code># load data
+library(udpipe)
+data(&quot;brussels_reviews_anno&quot;, package = &quot;udpipe&quot;)
+
+# prepare data
+x &lt;- subset(brussels_reviews_anno, language == &quot;nl&quot;)
+x &lt;- subset(x, xpos %in% c(&quot;NN&quot;, &quot;NNP&quot;, &quot;NNS&quot;))
+x &lt;- x[, c(&quot;doc_id&quot;, &quot;lemma&quot;)]</code></pre>
+<pre class="r"><code>library(BTM)
+set.seed(123456)
+BTM_model &lt;- BTM(x, k = 5, alpha = 1, beta = 0.01, iter = 10, trace = TRUE)
+
+saveRDS(BTM_model, file = paste0(path, &quot;/BTM_model.RDS&quot;))
+
+topics_btm &lt;- terms(BTM_model) # causes issues when knitting, thus saved here and loaded below
+saveRDS(topics_btm, file = paste0(path, &quot;/topics_btm.RDS&quot;))</code></pre>
+<pre class="r"><code># get topic terms
+topics_btm &lt;- terms(BTM_model)</code></pre>
+<pre class="r"><code># show topic 1
+topics_btm[[1]]</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["token"],"name":[1],"type":["chr"],"align":["left"]},{"label":["probability"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"appartement","2":"0.04468092","_rn_":"1"},{"1":"brussel","2":"0.03059687","_rn_":"2"},{"1":"huis","2":"0.02238927","_rn_":"3"},{"1":"kamer","2":"0.01826118","_rn_":"4"},{"1":"centrum","2":"0.01612429","_rn_":"5"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>These top terms are used as input for our <code>label_topics</code>
+function:</p>
+<pre class="r"><code># label_topics
+labels_btm &lt;- label_topics(topics_btm, context = &quot;Reviews of AirBnB customers on Brussels address locations&quot;, token = token)</code></pre>
+<pre><code>## Labeling 5 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
+<pre><code>## Labeling process finished</code></pre>
+<pre class="r"><code>labels_btm </code></pre>
+<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
+##  1: Brussels city center apartments [appartement, brussel, huis, kamer, centrum]
+##  2: Brussels apartment rental [appartement, brussel, buurt, verblijf, huis]
+##  3: Central Brussels Apartments [appartement, brussel, kamer, aanrader, cen...]
+##  4: Brussels apartment rental [appartement, brussel, kamer, badkamer, bed]
+##  5: Brussels city center apartments [appartement, brussel, centrum, kamer, locatie]</code></pre>
+<p>As we can see, the LLM
+<code>mistralai/Mixtral-8x7B-Instruct-v0.1</code> can also handle Dutch
+top terms and generates English labels. The labels are relatively
+similar, but so are the top terms of the BTM example data.</p>
+</div>
+<div id="ldaprototype" class="section level2">
+<h2>ldaPrototype</h2>
+<p>We use the example from the package GitHub repository (see also
+Rieger, 2020): <a href="https://github.com/JonasRieger/ldaPrototype" class="uri">https://github.com/JonasRieger/ldaPrototype</a></p>
+<pre class="r"><code># load data
+library(ldaPrototype)
+data(reuters_docs)
+data(reuters_vocab)</code></pre>
+<pre class="r"><code># ldaPrototype topic model
+res = LDAPrototype(docs = reuters_docs, vocabLDA = reuters_vocab, n = 4, K = 10, seeds = 1:4)
+
+# save
+saveRDS(res, file = paste0(path, &quot;/res.RDS&quot;))</code></pre>
+<pre class="r"><code># get topics
+library(ldaPrototype)
+topics_ldaproto &lt;- tosca::topWords(getTopics(getLDA(res)), 10)
+
+topics_ldaproto</code></pre>
+<pre><code>##       [,1]       [,2]     [,3]         [,4]          [,5]       [,6]      
+##  [1,] &quot;billion&quot;  &quot;sales&quot;  &quot;technology&quot; &quot;bankamerica&quot; &quot;share&quot;    &quot;company&quot; 
+##  [2,] &quot;dlrs&quot;     &quot;dlrs&quot;   &quot;told&quot;       &quot;debt&quot;        &quot;quarter&quot;  &quot;said&quot;    
+##  [3,] &quot;week&quot;     &quot;york&quot;   &quot;will&quot;       &quot;analysts&quot;    &quot;company&quot;  &quot;inc&quot;     
+##  [4,] &quot;compared&quot; &quot;times&quot;  &quot;licensing&quot;  &quot;interest&quot;    &quot;said&quot;     &quot;shares&quot;  
+##  [5,] &quot;said&quot;     &quot;new&quot;    &quot;cranston&quot;   &quot;stock&quot;       &quot;chemlawn&quot; &quot;common&quot;  
+##  [6,] &quot;reserve&quot;  &quot;avoid&quot;  &quot;evans&quot;      &quot;banking&quot;     &quot;earnings&quot; &quot;units&quot;   
+##  [7,] &quot;bank&quot;     &quot;cocoa&quot;  &quot;exports&quot;    &quot;brazil&quot;      &quot;fourth&quot;   &quot;offering&quot;
+##  [8,] &quot;mln&quot;      &quot;cover&quot;  &quot;authority&quot;  &quot;co&quot;          &quot;waste&quot;    &quot;corp&quot;    
+##  [9,] &quot;new&quot;      &quot;senate&quot; &quot;reporters&quot;  &quot;said&quot;        &quot;fiscal&quot;   &quot;reuter&quot;  
+## [10,] &quot;banks&quot;    &quot;tax&quot;    &quot;control&quot;    &quot;first&quot;       &quot;cash&quot;     &quot;systems&quot; 
+##       [,7]     [,8]        [,9]       [,10]    
+##  [1,] &quot;vs&quot;     &quot;peladeau&quot;  &quot;orders&quot;   &quot;total&quot;  
+##  [2,] &quot;cts&quot;    &quot;paper&quot;     &quot;report&quot;   &quot;offered&quot;
+##  [3,] &quot;mln&quot;    &quot;two&quot;       &quot;reagan&quot;   &quot;bid&quot;    
+##  [4,] &quot;shr&quot;    &quot;newspaper&quot; &quot;capital&quot;  &quot;river&quot;  
+##  [5,] &quot;net&quot;    &quot;quebecor&quot;  &quot;november&quot; &quot;wheat&quot;  
+##  [6,] &quot;profit&quot; &quot;companies&quot; &quot;tower&quot;    &quot;feb&quot;    
+##  [7,] &quot;loss&quot;   &quot;said&quot;      &quot;tax&quot;      &quot;prev&quot;   
+##  [8,] &quot;revs&quot;   &quot;daily&quot;     &quot;pct&quot;      &quot;nil&quot;    
+##  [9,] &quot;record&quot; &quot;will&quot;      &quot;fed&quot;      &quot;apr&quot;    
+## [10,] &quot;march&quot;  &quot;new&quot;       &quot;public&quot;   &quot;mar&quot;</code></pre>
+<p>These top terms are used as input for our <code>label_topics</code>
+function.</p>
+<pre class="r"><code># label_topics
+labels_ldaproto &lt;- label_topics(topics_ldaproto, context = &quot;Reuters news data&quot;, token = token)</code></pre>
+<pre><code>## Labeling 10 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
+<pre><code>## Labeling process finished</code></pre>
+<pre class="r"><code>labels_ldaproto</code></pre>
+<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
+##  1: Bank Reserves and Liquidity [billion, dlrs, week, compared, said, reser...]
+##  2: New York Sales Tax [sales, dlrs, york, times, new, avoid, coco...]
+##  3: Technology Licensing and Control [technology, told, will, licensing, cransto...]
+##  4: Bank of America&#39;s debt and stock [bankamerica, debt, analysts, interest, sto...]
+##  5: Company Earnings Report [share, quarter, company, said, chemlawn, e...]
+##  6: Common Stock Offering [company, said, inc, shares, common, units,...]
+##  7: Quarterly financial results [vs, cts, mln, shr, net, profit, loss, revs...]
+##  8: Quebecor&#39;s newspaper companies [peladeau, paper, two, newspaper, quebecor,...]
+##  9: Reagan&#39;s Tax Policy [orders, report, reagan, capital, november,...]
+##  10: Agricultural Commodities Trading [total, offered, bid, river, wheat, feb, pr...]</code></pre>
+</div>
+</div>
+<div id="performance-evaluation" class="section level1">
+<h1>Performance evaluation</h1>
 <p>To evaluate the performance of the <code>label_topics()</code>
 function, we compare the automatically generated labels with human
 labels from various studies. Inclusion criteria for the studies
@@ -1829,12 +2115,9 @@ as.data.frame(human_labels[1:5, c(1,3:4)])</code></pre>
   </script>
 </div>
 </div>
-</div>
-<div id="topic-labeling-with-llm" class="section level1">
-<h1>Topic labeling with LLM</h1>
 <div id="standard-labeling" class="section level2">
 <h2>Standard labeling</h2>
-<pre class="r"><code>LLM_labels &lt;- label_topics(as.list(human_labels$Top_Terms), token = hf_token)
+<pre class="r"><code>LLM_labels &lt;- label_topics(as.list(human_labels$Top_Terms), token = token)
 
 # save
 saveRDS(LLM_labels, file = paste0(path, &quot;/LLM_labels.RDS&quot;))</code></pre>
@@ -1877,7 +2160,7 @@ list of labels using the HuggingFace API:</p>
 # using the HuggingFace API and the code from:
 # https://github.com/AndreasFischer1985/code-snippets/blob/master/R/huggingface_SentenceEmbeddingsTest.R
 
-get_embeddings &lt;- function(prompts, model_id = &quot;llmrails/ember-v1&quot;, api_token = hf_token) {
+get_embeddings &lt;- function(prompts, model_id = &quot;llmrails/ember-v1&quot;, api_token = token) {
   
   require(&quot;httr&quot;)
   e=list()
@@ -2203,7 +2486,7 @@ for (i in 1:length(context)){
   input &lt;- human_labels$Top_Terms[human_labels$Study == study]
   
   # label_topics with context
-  LLM_labels_context[[i]] &lt;- label_topics(as.list(input), context = context[i], token = hf_token)
+  LLM_labels_context[[i]] &lt;- label_topics(as.list(input), context = context[i], token = token)
 }
 
 # save
@@ -2276,7 +2559,7 @@ Let’s try a different context phrasing for these topics:</p>
 Kwon_input &lt;- human_labels$Top_Terms[human_labels$Study == &quot;Kwon 2023&quot;]
 # Kwon_context &lt;- &quot;Racial equity in urban planning&quot; # original context
 Kwon_context &lt;- &quot;Racial Equity and Justice in Urban Studies and Planning&quot;
-Kwon_labels &lt;- label_topics(as.list(Kwon_input), context = Kwon_context, token = hf_token)</code></pre>
+Kwon_labels &lt;- label_topics(as.list(Kwon_input), context = Kwon_context, token = token)</code></pre>
 <pre><code>## Labeling 8 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
 <pre><code>## Labeling process finished</code></pre>
 <pre class="r"><code>Kwon_labels</code></pre>
@@ -2336,295 +2619,11 @@ quickly get an overview of the topics in a corpus. However, the
 LLM-generated labels should be used with caution and only as
 complementary tool to human judgement and proper topic validation.</p>
 </div>
-<div id="how-to-use-the-topiclabels-package-with-other-topic-modeling-packages" class="section level1">
-<h1>How to use the topiclabels package with other topic modeling
-packages</h1>
-<p>Our proposed R package can be used with other topic modeling packages
-as well. The only requirement is that the topic modeling package
-provides a function to extract the top terms of each topic. The user can
-then provide these top terms to the <code>label_topics</code> function.
-The <code>label_topics</code> function will then generate the topic
-labels based on the provided top terms.</p>
-<p>In the following, we will illustrate this for different popular R
-packages (see Wiedemann, 2002, <a href="http://dx.doi.org/10.5771/1615-634X-2022-3-286" class="uri">http://dx.doi.org/10.5771/1615-634X-2022-3-286</a>)</p>
-<div id="topicmodels" class="section level2">
-<h2>topicmodels</h2>
-<p>We use the example from the package vignette (Grün &amp; Hornik,
-2024): <a href="https://cran.r-project.org/web/packages/topicmodels/vignettes/topicmodels.pdf" class="uri">https://cran.r-project.org/web/packages/topicmodels/vignettes/topicmodels.pdf</a></p>
-<pre class="r"><code># load data
-library(topicmodels)
-data(&quot;JSS_papers&quot;, package = &quot;topicmodels&quot;)
-
-# transform to corpus
-library(tm)
-corpus &lt;- Corpus(VectorSource(unlist(JSS_papers[, &quot;description&quot;])))
-JSS_dtm &lt;- DocumentTermMatrix(corpus,
- control = list(stemming = TRUE, stopwords = TRUE, minWordLength = 3,
- removeNumbers = TRUE, removePunctuation = TRUE))</code></pre>
-<pre class="r"><code># run topic model
-jss_TM &lt;- LDA(JSS_dtm, k = 30, control = list(seed = 2010))
-
-# save
-saveRDS(jss_TM, file = paste0(path, &quot;/jss_TM.RDS&quot;))</code></pre>
-<pre class="r"><code># get topics
-topics_topicmodels &lt;- topicmodels::terms(jss_TM, 5)
-topics_topicmodels[,1:5]</code></pre>
-<pre><code>##      Topic 1   Topic 2     Topic 3   Topic 4   Topic 5  
-## [1,] &quot;network&quot; &quot;algorithm&quot; &quot;data&quot;    &quot;use&quot;     &quot;cluster&quot;
-## [2,] &quot;data&quot;    &quot;packag&quot;    &quot;statist&quot; &quot;www&quot;     &quot;model&quot;  
-## [3,] &quot;model&quot;   &quot;data&quot;      &quot;use&quot;     &quot;statist&quot; &quot;packag&quot; 
-## [4,] &quot;packag&quot;  &quot;provid&quot;    &quot;method&quot;  &quot;java&quot;    &quot;method&quot; 
-## [5,] &quot;use&quot;     &quot;function&quot;  &quot;infer&quot;   &quot;can&quot;     &quot;can&quot;</code></pre>
-<p>These top terms are used as input for our <code>label_topics</code>
-function:</p>
-<pre class="r"><code># label_topics
-labels_topicmodels &lt;- label_topics(topics_topicmodels, context = &quot;Journal of Statistical Software&quot;, token = hf_token)</code></pre>
-<pre><code>## Labeling 30 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
-<pre><code>## Labeling process finished</code></pre>
-<pre class="r"><code>labels_topicmodels</code></pre>
-<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
-##  1: Network Analysis [network, data, model, packag, use]
-##  2: Data Analysis Tools [algorithm, packag, data, provid, function]
-##  3: Statistical Methods [data, statist, use, method, infer]
-##  4: Statistical Software [use, www, statist, java, can]
-##  5: Clustering Methods [cluster, model, packag, method, can]
-##  6: Data Visualization [packag, model, use, method, graphic]
-##  7: Data Analysis and Visualization [data, use, packag, imag, method]
-##  8: Smooth Model Fitting [use, model, smooth, fit, program]
-##  9: Statistical Modeling [model, estim, packag, data, function]
-##  10: Tumor Detection Tools [test, tool, polyk, tumor, wave]
-##  11: Modeling functions [model, packag, function, fit, provid]
-##  12: Statistical programming in Lisp [use, statist, packag, can, lispstat]
-##  13: Software packages and solutions [code, packag, solv, use, problem]
-##  14: Regression Model [model, variabl, standard, confid, regress]
-##  15: Statistical Software Packages [model, packag, use, data, softwar]
-##  16: Statistical Methods [estim, statist, packag, method, use]
-##  17: Model Selection and Evaluation [model, data, use, term, miss]
-##  18: Software Development [method, design, function, packag, paper]
-##  19: Statistical Computing Methods [method, statist, use, paper, comput]
-##  20: Modeling methods for graphs [model, method, graph, use, popul]
-##  21: Statistical modeling packages [test, statist, packag, model, distribut]
-##  22: Statistical Computing [formula, use, sampl, comput, statist]
-##  23: Statistical Modeling [model, regress, algorithm, problem, data]
-##  24: Density Function Computation [densiti, function, use, provid, comput]
-##  25: Software performance evaluation [softwar, use, roc, curv, comput]
-##  26: Data Visualization Packages [graphic, interfac, data, user, packag]
-##  27: Multivariate Analysis [analysi, data, multivari, packag, scale]
-##  28: Statistical Testing [test, data, random, generat, matric]
-##  29: Sampling and Estimation Methods [sampl, use, estim, method, data]
-##  30: Maximum Likelihood Estimation [model, estim, respons, likelihood, maximum]</code></pre>
-</div>
-<div id="stm" class="section level2">
-<h2>stm</h2>
-<p>We use the example from the package vignette (Roberts et al., 2019):
-<a href="https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf" class="uri">https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf</a></p>
-<pre class="r"><code>data &lt;- read.csv(&quot;https://raw.githubusercontent.com/dondealban/learning-stm/master/data/poliblogs2008.csv&quot;)</code></pre>
-<pre class="r"><code># preprocessing
-library(stm)
-processed &lt;- textProcessor(data$documents, metadata = data)</code></pre>
-<pre class="r"><code># corpus preparation
-out &lt;- prepDocuments(processed$documents, processed$vocab, processed$meta, lower.thresh = 15)</code></pre>
-<pre class="r"><code># stm topic model
-poliblogPrevFit &lt;- stm(documents = out$documents, vocab = out$vocab,
- K = 20, prevalence =~ rating + s(day),
- max.em.its = 75, data = out$meta,
- init.type = &quot;Spectral&quot;)
-
-# save
-saveRDS(poliblogPrevFit, file = paste0(path, &quot;/poliblogPrevFit.RDS&quot;))</code></pre>
-<pre class="r"><code># get topics
-topics_stm &lt;- stm::labelTopics(poliblogPrevFit, c(3, 7, 20))
-
-# show the topics 3, 7, and 20 (as in vignette)
-stm::labelTopics(poliblogPrevFit, c(3, 7, 20))</code></pre>
-<pre><code>## Topic 3 Top Words:
-##       Highest Prob: obama, barack, campaign, biden, polit, will, debat 
-##       FREX: ayer, barack, obama, wright, biden, jeremiah, joe 
-##       Lift: oct, goolsbe, ayerss, ayr, bernadin, ayer, annenberg 
-##       Score: oct, obama, barack, ayer, wright, campaign, biden 
-## Topic 7 Top Words:
-##       Highest Prob: palin, governor, sarah, state, alaska, polit, senat 
-##       FREX: blagojevich, palin, sarah, rezko, alaska, governor, gov 
-##       Lift: jindal, blagojevich, juneau, monegan, blago, burri, wasilla 
-##       Score: monegan, palin, blagojevich, sarah, alaska, rezko, governor 
-## Topic 20 Top Words:
-##       Highest Prob: bush, presid, administr, said, hous, white, report 
-##       FREX: cheney, tortur, cia, administr, interrog, bush, perino 
-##       Lift: addington, fratto, perino, mcclellan, feith, plame, cheney 
-##       Score: addington, bush, tortur, perino, cia, cheney, administr</code></pre>
-<p>For STM topics, you can choose the type of term profiles. STM offers
-“prob”, “frex”, “lift”, “score” (see <a href="https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf">stm
-vignette</a>), which you can specify using the <code>stm_type</code>
-argument. By default, “prob” is used.</p>
-<pre class="r"><code># label_topics: default stm_type (&quot;prob&quot;)
-labels_stm &lt;- label_topics(topics_stm, context = &quot;blogposts about American
-politics&quot;, token = hf_token)</code></pre>
-<pre><code>## Labeling 20 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
-<pre><code>## Labeling process finished</code></pre>
-<pre class="r"><code>labels_stm</code></pre>
-<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
-##  1: Obama&#39;s Lead in Polls [obama, poll, mccain, voter, state, democra...]
-##  2: Public Opinion on Politics [peopl, think, polit, like, right, just, one]
-##  3: Obama-Biden Political Campaign [obama, barack, campaign, biden, polit, wil...]
-##  4: Informal language and negation [get, one, like, just, want, can, dont]
-##  5: Energy Policy and Prices [oil, energi, will, price, drill, gas, product]
-##  6: US Political Campaigns [elect, vote, voter, campaign, republican, ...]
-##  7: Alaska Governor Sarah Palin [palin, governor, sarah, state, alaska, pol...]
-##  8: Government Finances [tax, money, million, financi, govern, spen...]
-##  9: Media and News [media, time, report, news, stori, press, new]
-##  10: Congressional Legislation [democrat, senat, bill, republican, vote, h...]
-##  11: Legal and Court Proceedings [law, court, state, right, case, rule, legal]
-##  12: Iraq War and Military [iraq, war, militari, iraqi, troop, forc, will]
-##  13: Iranian Nuclear Program [iran, nuclear, world, state, nation, will,...]
-##  14: American people&#39;s work and care [will, american, america, peopl, care, work...]
-##  15: Terrorism in Middle East [terrorist, attack, israel, kill, terror, g...]
-##  16: Diverse Life Experiences [one, will, film, women, allah, life, day]
-##  17: Global Warming and Research [global, warm, univers, abort, studi, resea...]
-##  18: John McCain&#39;s Campaign [mccain, john, said, campaign, sen, say, think]
-##  19: Hillary Clinton&#39;s Democratic Primary Campaign [clinton, hillari, will, democrat, primari,...]
-##  20: Bush Administration [bush, presid, administr, said, hous, white...]</code></pre>
-<pre class="r"><code># label_topics: frex
-labels_stm_frex &lt;- label_topics(topics_stm, stm_type = &quot;frex&quot;, context = &quot;blogposts about American politics&quot;, token = hf_token)</code></pre>
-<pre><code>## Labeling 20 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
-<pre><code>## Labeling process finished</code></pre>
-<pre class="r"><code>labels_stm_frex</code></pre>
-<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
-##  1: Pennsylvania-Virginia Polling [poll, pennsylvania, virginia, percent, mar...]
-##  2: Religious Conservatism [church, digbi, liber, black, linktocomment...]
-##  3: Obama&#39;s Pastor Controversy [ayer, barack, obama, wright, biden, jeremi...]
-##  4: Negative Contractions [cant, eastern, doesnt, isnt, didnt, clip, ...]
-##  5: Energy and Oil Prices [drill, oil, mugab, energi, gas, price, pro...]
-##  6: Minnesota Senate Recount [franken, coleman, ballot, registr, acorn, ...]
-##  7: Illinois and Alaska Governors [blagojevich, palin, sarah, rezko, alaska, ...]
-##  8: Housing finance [financi, loan, fanni, mortgag, taxpay, fre...]
-##  9: Matthew O&#39;Reilly Media Coverage [matthew, media, journalist, coverag, stori...]
-##  10: Democratic Leadership [legisl, pelosi, reid, bipartisan, fisa, na...]
-##  11: Constitutional Law [court, illeg, law, constitut, prosecut, le...]
-##  12: Iraqi Politics and Security [maliki, petraeus, iraqi, baghdad, iraq, tr...]
-##  13: Middle East Nuclear Tensions [russian, russia, iran, nuclear, iranian, p...]
-##  14: Healthcare and Labor [health, care, union, educ, america, job, w...]
-##  15: Middle East Politics [palestinian, hama, musharraf, pakistan, pa...]
-##  16: Islamic Religious Film [film, allah, muhammad, girl, qur, vers, un...]
-##  17: Climate Change [warm, abort, scientist, climat, scientif, ...]
-##  18: Conservative Pundits [mccain, raz, john, sen, clark, hanniti, kr...]
-##  19: Clinton vs. Romney in Primaries [hillari, clinton, huckabe, deleg, romney, ...]
-##  20: Bush-era Torture Policies [cheney, tortur, cia, administr, interrog, ...]</code></pre>
-<p>In the package <a href="https://cran.r-project.org/web/packages/stm/vignettes/stmVignette.pdf">vignette</a>
-(page 19), Topic 3 is labeled as “Obama”, Topic 7 as “Sarah Palin”, and
-Topic 20 as “Bush Presidency”.</p>
-</div>
-<div id="btm" class="section level2">
-<h2>BTM</h2>
-<p>We use the example from the package reference manual (Wijffels,
-2023): <a href="https://cran.r-project.org/web/packages/BTM/BTM.pdf" class="uri">https://cran.r-project.org/web/packages/BTM/BTM.pdf</a></p>
-<pre class="r"><code># load data
-library(udpipe)
-data(&quot;brussels_reviews_anno&quot;, package = &quot;udpipe&quot;)
-
-# prepare data
-x &lt;- subset(brussels_reviews_anno, language == &quot;nl&quot;)
-x &lt;- subset(x, xpos %in% c(&quot;NN&quot;, &quot;NNP&quot;, &quot;NNS&quot;))
-x &lt;- x[, c(&quot;doc_id&quot;, &quot;lemma&quot;)]</code></pre>
-<pre class="r"><code>library(BTM)
-set.seed(123456)
-BTM_model &lt;- BTM(x, k = 5, alpha = 1, beta = 0.01, iter = 10, trace = TRUE)
-
-saveRDS(BTM_model, file = paste0(path, &quot;/BTM_model.RDS&quot;))
-
-topics_btm &lt;- terms(BTM_model) # causes issues when knitting, thus saved here and loaded below
-saveRDS(topics_btm, file = paste0(path, &quot;/topics_btm.RDS&quot;))</code></pre>
-<pre class="r"><code># get topic terms
-topics_btm &lt;- terms(BTM_model)</code></pre>
-<pre class="r"><code># show topic 1
-topics_btm[[1]]</code></pre>
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["token"],"name":[1],"type":["chr"],"align":["left"]},{"label":["probability"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"appartement","2":"0.04468092","_rn_":"1"},{"1":"brussel","2":"0.03059687","_rn_":"2"},{"1":"huis","2":"0.02238927","_rn_":"3"},{"1":"kamer","2":"0.01826118","_rn_":"4"},{"1":"centrum","2":"0.01612429","_rn_":"5"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-<p>These top terms are used as input for our <code>label_topics</code>
-function:</p>
-<pre class="r"><code># label_topics
-labels_btm &lt;- label_topics(topics_btm, context = &quot;Reviews of AirBnB customers on Brussels address locations&quot;, token = hf_token)</code></pre>
-<pre><code>## Labeling 5 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
-<pre><code>## Labeling process finished</code></pre>
-<pre class="r"><code>labels_btm </code></pre>
-<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
-##  1: Brussels city center apartments [appartement, brussel, huis, kamer, centrum]
-##  2: Brussels apartment rental [appartement, brussel, buurt, verblijf, huis]
-##  3: Central Brussels Apartments [appartement, brussel, kamer, aanrader, cen...]
-##  4: Brussels apartment rental [appartement, brussel, kamer, badkamer, bed]
-##  5: Brussels city center apartments [appartement, brussel, centrum, kamer, locatie]</code></pre>
-<p>As we can see, the LLM
-<code>mistralai/Mixtral-8x7B-Instruct-v0.1</code> can also handle Dutch
-top terms and generates English labels. The labels are relatively
-similar, but so are the top terms of the BTM example data.</p>
-</div>
-<div id="ldaprototype" class="section level2">
-<h2>ldaPrototype</h2>
-<p>We use the example from the package GitHub repository (see also
-Rieger, 2020): <a href="https://github.com/JonasRieger/ldaPrototype" class="uri">https://github.com/JonasRieger/ldaPrototype</a></p>
-<pre class="r"><code># load data
-library(ldaPrototype)
-data(reuters_docs)
-data(reuters_vocab)</code></pre>
-<pre class="r"><code># ldaPrototype topic model
-res = LDAPrototype(docs = reuters_docs, vocabLDA = reuters_vocab, n = 4, K = 10, seeds = 1:4)
-
-# save
-saveRDS(res, file = paste0(path, &quot;/res.RDS&quot;))</code></pre>
-<pre class="r"><code># get topics
-library(ldaPrototype)
-topics_ldaproto &lt;- tosca::topWords(getTopics(getLDA(res)), 10)
-
-topics_ldaproto</code></pre>
-<pre><code>##       [,1]       [,2]     [,3]         [,4]          [,5]       [,6]      
-##  [1,] &quot;billion&quot;  &quot;sales&quot;  &quot;technology&quot; &quot;bankamerica&quot; &quot;share&quot;    &quot;company&quot; 
-##  [2,] &quot;dlrs&quot;     &quot;dlrs&quot;   &quot;told&quot;       &quot;debt&quot;        &quot;quarter&quot;  &quot;said&quot;    
-##  [3,] &quot;week&quot;     &quot;york&quot;   &quot;will&quot;       &quot;analysts&quot;    &quot;company&quot;  &quot;inc&quot;     
-##  [4,] &quot;compared&quot; &quot;times&quot;  &quot;licensing&quot;  &quot;interest&quot;    &quot;said&quot;     &quot;shares&quot;  
-##  [5,] &quot;said&quot;     &quot;new&quot;    &quot;cranston&quot;   &quot;stock&quot;       &quot;chemlawn&quot; &quot;common&quot;  
-##  [6,] &quot;reserve&quot;  &quot;avoid&quot;  &quot;evans&quot;      &quot;banking&quot;     &quot;earnings&quot; &quot;units&quot;   
-##  [7,] &quot;bank&quot;     &quot;cocoa&quot;  &quot;exports&quot;    &quot;brazil&quot;      &quot;fourth&quot;   &quot;offering&quot;
-##  [8,] &quot;mln&quot;      &quot;cover&quot;  &quot;authority&quot;  &quot;co&quot;          &quot;waste&quot;    &quot;corp&quot;    
-##  [9,] &quot;new&quot;      &quot;senate&quot; &quot;reporters&quot;  &quot;said&quot;        &quot;fiscal&quot;   &quot;reuter&quot;  
-## [10,] &quot;banks&quot;    &quot;tax&quot;    &quot;control&quot;    &quot;first&quot;       &quot;cash&quot;     &quot;systems&quot; 
-##       [,7]     [,8]        [,9]       [,10]    
-##  [1,] &quot;vs&quot;     &quot;peladeau&quot;  &quot;orders&quot;   &quot;total&quot;  
-##  [2,] &quot;cts&quot;    &quot;paper&quot;     &quot;report&quot;   &quot;offered&quot;
-##  [3,] &quot;mln&quot;    &quot;two&quot;       &quot;reagan&quot;   &quot;bid&quot;    
-##  [4,] &quot;shr&quot;    &quot;newspaper&quot; &quot;capital&quot;  &quot;river&quot;  
-##  [5,] &quot;net&quot;    &quot;quebecor&quot;  &quot;november&quot; &quot;wheat&quot;  
-##  [6,] &quot;profit&quot; &quot;companies&quot; &quot;tower&quot;    &quot;feb&quot;    
-##  [7,] &quot;loss&quot;   &quot;said&quot;      &quot;tax&quot;      &quot;prev&quot;   
-##  [8,] &quot;revs&quot;   &quot;daily&quot;     &quot;pct&quot;      &quot;nil&quot;    
-##  [9,] &quot;record&quot; &quot;will&quot;      &quot;fed&quot;      &quot;apr&quot;    
-## [10,] &quot;march&quot;  &quot;new&quot;       &quot;public&quot;   &quot;mar&quot;</code></pre>
-<p>These top terms are used as input for our <code>label_topics</code>
-function.</p>
-<pre class="r"><code># label_topics
-labels_ldaproto &lt;- label_topics(topics_ldaproto, context = &quot;Reuters news data&quot;, token = hf_token)</code></pre>
-<pre><code>## Labeling 10 topic(s) using the language model mistralai/Mixtral-8x7B-Instruct-v0.1 and a Huggingface API token.</code></pre>
-<pre><code>## Labeling process finished</code></pre>
-<pre class="r"><code>labels_ldaproto</code></pre>
-<pre><code>## lm_topic_labels object generated using mistralai/Mixtral-8x7B-Instruct-v0.1
-##  1: Bank Reserves and Liquidity [billion, dlrs, week, compared, said, reser...]
-##  2: New York Sales Tax [sales, dlrs, york, times, new, avoid, coco...]
-##  3: Technology Licensing and Control [technology, told, will, licensing, cransto...]
-##  4: Bank of America&#39;s debt and stock [bankamerica, debt, analysts, interest, sto...]
-##  5: Company Earnings Report [share, quarter, company, said, chemlawn, e...]
-##  6: Common Stock Offering [company, said, inc, shares, common, units,...]
-##  7: March Earnings Reports [vs, cts, mln, shr, net, profit, loss, revs...]
-##  8: Quebecor&#39;s newspaper companies [peladeau, paper, two, newspaper, quebecor,...]
-##  9: Reagan&#39;s Tax Policy [orders, report, reagan, capital, november,...]
-##  10: Agricultural Commodities Trading [total, offered, bid, river, wheat, feb, pr...]</code></pre>
-</div>
-</div>
 <div id="references" class="section level1">
 <h1>References</h1>
-<p>Bittermann, A., McNamara, D., Simonsmeier, B.A. et al. The Landscape
-of Research on Prior Knowledge and Learning: a Bibliometric Analysis.
-Educ Psychol Rev 35, 58 (2023). <a href="https://doi.org/10.1007/s10648-023-09775-9" class="uri">https://doi.org/10.1007/s10648-023-09775-9</a> </p>
+<p>Bittermann, A., McNamara, D., Simonsmeier, B.A., &amp; Schneider, M.
+(2023). The Landscape of Research on Prior Knowledge and Learning: a
+Bibliometric Analysis. Educational Psychology Review, 35, 58. <a href="https://doi.org/10.1007/s10648-023-09775-9" class="uri">https://doi.org/10.1007/s10648-023-09775-9</a> </p>
 <p>Dwivedi, Y. K., Sharma, A., Rana, N. P., Giannakis, M., Goel, P.,
 &amp; Dutot, V. (2023). Evolution of artificial intelligence research in
 Technological Forecasting and Social Change: Research topics, trends,
