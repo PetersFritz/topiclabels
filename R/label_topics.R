@@ -48,6 +48,7 @@
 #' The model must be accessible via the Huggingface API. Default is
 #' \code{mistralai/Mixtral-8x7B-Instruct-v0.1}. Other promising models are
 #' \code{HuggingFaceH4/zephyr-7b-beta} or \code{tiiuae/falcon-7b-instruct}.
+#' To find more models see: https://huggingface.co/models?other=conversational&sort=likes.
 #' @param params [\code{named list}]\cr
 #' Optional.\cr
 #' Model parameters to pass. Default parameters for common models are
