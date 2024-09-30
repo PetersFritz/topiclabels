@@ -9,8 +9,9 @@ topiclabels leverages (large) language models for automatic topic labeling. The 
 ## References
 
 *Related work*:
-* [Li et al. (2023). Can Large Language Models (LLM) label topics from a topic model?](https://osf.io/preprints/socarxiv/23x4m)
 * [Grootendorst (2023). Topic Modeling with Llama 2. Create easily interpretable topics with Large Language Models](https://newsletter.maartengrootendorst.com/p/topic-modeling-with-llama-2?trk=feed_main-feed-card_feed-article-content)
+* [Li et al. (2023). Can Large Language Models (LLM) label topics from a topic model?](https://osf.io/preprints/socarxiv/23x4m)
+* [Wanna et al. (2024). TopicTag: Automatic Annotation of NMF Topic Models Using Chain of Thought and Prompt Tuning with LLMs.(https://arxiv.org/abs/2407.19616)
 
 *Topic models (selection)*:
 * [BERTopic](https://github.com/MaartenGr/BERTopic)
