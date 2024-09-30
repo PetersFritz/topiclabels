@@ -45,10 +45,11 @@ First of all, you should store your Huggingface token in the variable ``token``.
 ``` r
 token = "" # set your hf token here
 ```
-We would now like to label two topics, one with the three top terms *zidane, figo, kroos* and the other with the three top terms *gas, power, wind*.
+We would now like to label two topics, one with the three top terms *zidane, figo, kroos* and the other with the three top terms *gas, power, wind*. Here, we show three typical variants of topic representation:
 ``` r
 topwords_matrix = matrix(c("zidane", "figo", "kroos", "gas", "power", "wind"), ncol = 2)
 topwords_list = list(c("zidane", "figo", "kroos"), c("gas", "power", "wind"))
+topwords_vector = c("zidane, figo, kroos", "gas, power, wind")
 ```
 A common way to represent top terms is a matrix structure.
 ```
@@ -67,10 +68,16 @@ topwords_list
 [[2]]
 [1] "gas"   "power" "wind" 
 ```
-Using one of the following two calls
+If you have stored your top terms as vectors (e.g., in a data table), it may look like this:
+```
+topwords_vector
+[1] "zidane, figo, kroos" "gas, power, wind" 
+```
+Using one of the following three calls
 ``` r
 label_topics(topwords_matrix, token = token)
 label_topics(topwords_list, token = token)
+label_topics(as.list(topwords_vector), token = token)
 ```
 the labels for the two topics can then be generated, which yields
 ```
