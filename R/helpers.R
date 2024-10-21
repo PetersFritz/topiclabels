@@ -70,7 +70,10 @@
                   title = paste0("\nThe predefined waiting time if the rate ",
                                  "limit is reached has been exceeded. Would ",
                                  "you like to continue waiting ",
-                                 "for all topics to be labeled?"))
+                                 "for all topics to be labeled?",
+                                 "\nThis is not recommended/effective if the ",
+                                 "model signals that you should log in or ",
+                                 "use an access token."))
   if(continue == 2) return(0L)
   repeat{
     max_wait = readline(

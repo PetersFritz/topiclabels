@@ -177,7 +177,13 @@ label_topics.default = function(
                                params = params,
                                prompt = prompts[i],
                                token = token)[[1]][[1]]
-    while(grepl("rate limit reached", model_output[i], ignore.case = TRUE)){
+    need_hf_token_or_rate_limit =
+      grepl("(please)? ?log in|(hf)? ?access token",
+            model_output[i], ignore.case = TRUE) ||
+      grepl("rate limit reached", model_output[i], ignore.case = TRUE)
+    if(need_hf_token_or_rate_limit)
+      message("Message from HuggingFace: ", model_output[i])
+    while(need_hf_token_or_rate_limit){
       if(as.numeric(difftime(Sys.time(), waited, units = "mins")) > max_wait){
         max_wait = .ask_user()
         if(max_wait == 0L){
@@ -202,6 +208,10 @@ label_topics.default = function(
                                  params = params,
                                  prompt = prompts[i],
                                  token = token)[[1]][[1]]
+      need_hf_token_or_rate_limit =
+        grepl("(please)? ?log in|(hf)? ?access token",
+              model_output[i], ignore.case = TRUE) ||
+        grepl("rate limit reached", model_output[i], ignore.case = TRUE)
     }
     pb$tick()
   }
