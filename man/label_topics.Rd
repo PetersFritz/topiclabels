@@ -10,7 +10,7 @@ label_topics(...)
 
 \method{label_topics}{default}(
   terms,
-  model = "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  model = "google/gemma-2-2b-it",
   params = list(),
   token = NA_character_,
   context = "",
@@ -42,8 +42,8 @@ specify the type of output using the parameter \code{stm_type}) and the
 Optional.\cr
 The language model to use for labeling the topics.
 The model must be accessible via the Huggingface API. Default is
-\code{mistralai/Mixtral-8x7B-Instruct-v0.1}. Other promising models are
-\code{HuggingFaceH4/zephyr-7b-beta} or \code{tiiuae/falcon-7b-instruct}.
+\code{google/gemma-2-2b-it}. Another promising model is
+\code{deepseek-ai/DeepSeek-V3.2-Exp:novita}.
 To find more models see: https://huggingface.co/models?other=conversational&sort=likes.}
 
 \item{params}{[\code{named list}]\cr
@@ -103,8 +103,8 @@ If the automatically extracted labels show any errors, they can alternatively
 be extracted using custom functions or manually from the original output of
 the model using the \code{model_output} entry of the lm_topic_labels object.
 
-Implemented default parameters for the models \code{HuggingFaceH4/zephyr-7b-beta},
-\code{tiiuae/falcon-7b-instruct}, and \code{mistralai/Mixtral-8x7B-Instruct-v0.1} are:
+Implemented default parameters for the models \code{google/gemma-2-2b-it} and
+\code{deepseek-ai/DeepSeek-V3.2-Exp:novita} are:
 \describe{
   \item{\code{max_new_tokens}}{300}
   \item{\code{return_full_text}}{\code{FALSE}}
