@@ -1,7 +1,6 @@
 .default_model_params = function(model){
-  if(model == "HuggingFaceH4/zephyr-7b-beta" |
-     model == "tiiuae/falcon-7b-instruct" |
-     model == "mistralai/Mixtral-8x7B-Instruct-v0.1")
+  if(model == "google/gemma-2-2b-it" |
+     model == "deepseek-ai/DeepSeek-V3.2-Exp:novita")
     return(list("max_new_tokens" = 300, return_full_text = FALSE))
   return(list())
 }

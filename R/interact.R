@@ -1,4 +1,4 @@
-interact_with_token = function(model, params, prompt, token){
+interact = function(model, params, prompt, token){
   headers <- c(
     "Authorization" = paste("Bearer", token)
   )
@@ -11,13 +11,13 @@ interact_with_token = function(model, params, prompt, token){
     ),
     "model" = model
   )
-  for(i in 1 : length(params)) payload[names(params)[i]] = params[i] 
+  for(i in 1 : length(params)) payload[names(params)[i]] = params[i]
   response <- POST(
     url = "https://router.huggingface.co/v1/chat/completions",
     httr::add_headers(.headers = headers),
     body = payload,
     encode = "json"
-  )  
+  )
   if (http_error(response)) {
     stop(
       paste("Hugging Face API request failed with status:", status_code(response)),
