@@ -1,8 +1,8 @@
 Package: topiclabels
 Type: Package
 Title: Automated Topic Labeling with Language Models
-Version: 0.2.0
-Date: 2024-10-21
+Version: 0.3.0
+Date: 2025-10-27
 Authors@R: c(person(given = "Jonas",
            family = "Rieger",
            role = c("aut", "cre"),
