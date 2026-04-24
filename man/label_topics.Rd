@@ -10,7 +10,7 @@ label_topics(...)
 
 \method{label_topics}{default}(
   terms,
-  model = "google/gemma-2-2b-it",
+  model = "deepseek-ai/DeepSeek-V3.2-Exp:novita",
   params = list(),
   token = NA_character_,
   context = "",
@@ -42,8 +42,8 @@ specify the type of output using the parameter \code{stm_type}) and the
 Optional.\cr
 The language model to use for labeling the topics.
 The model must be accessible via the Huggingface API. Default is
-\code{google/gemma-2-2b-it}. Another promising model is
-\code{deepseek-ai/DeepSeek-V3.2-Exp:novita}.
+\code{deepseek-ai/DeepSeek-V3.2-Exp:novita}. Another promising model is
+\code{meta-llama/Llama-3.1-8B-Instruct}.
 To find more models see: https://huggingface.co/models?other=conversational&sort=likes.}
 
 \item{params}{[\code{named list}]\cr
