@@ -1,6 +1,6 @@
 .default_model_params = function(model){
-  if(model == "google/gemma-2-2b-it" |
-     model == "deepseek-ai/DeepSeek-V3.2-Exp:novita")
+  if(model == "deepseek-ai/DeepSeek-V3.2-Exp:novita" |
+     model == "meta-llama/Llama-3.1-8B-Instruct")
     return(list("max_new_tokens" = 300, return_full_text = FALSE))
   return(list())
 }
